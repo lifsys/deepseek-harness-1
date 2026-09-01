@@ -143,5 +143,11 @@ seam 正是替换一个提供方就能改变整个产品的原因。文件系统
 | 管理同会话目标 | 使用 `ctx.goals`；通过 `agent/*` 续跑 |
 | fork 活跃会话 | `ctx.sessions.fork(source, boundary?, childSessionId?)` |
 | 将注册项限定到单个 agent | 使用该 agent 的 `agent.ctx` |
+| 认证 Host RPC 调用方 | 注册 `ctx.trustIdentity`；api-gateway 调用 `requirePrincipal()` |
+| 拒绝未授权的工具执行 | 注册 `ctx.trustAuthorization`；在 `tools/pre-execute` 上挂 RBAC 守卫 |
+| 校验防篡改会话日志 | 注册 `ctx.trustLog`；加载时 fail-closed 校验 |
+| 导出企业审计记录 | 注册 `ctx.trustAudit`；文件或 OTLP 提供方 |
+| 用租约门控动态插件 | 注册 `ctx.trustLease`；cordis-host-runner 在 execute 前校验 |
+| 准入已签名的企业 bundle | 注册 `ctx.trustAdmission`；app-boot 在 ready 时校验 |
 
 [扩展实操手册](cookbook/extension-cookbook.zh.md)将功能映射到能力，并索引[包](cookbook/adding-a-package.zh.md)、[工具](cookbook/adding-a-tool.zh.md)、[LLM（大语言模型）适配器](cookbook/adding-an-llm-adapter.zh.md)和[设置卡片](cookbook/adding-a-settings-card.zh.md)的分步指南。[Conversation 子系统](subsystems/conversation.zh.md)负责 Chat node 组装。

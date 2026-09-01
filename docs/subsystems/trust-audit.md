@@ -1,6 +1,6 @@
 # Trust Audit
 
-English
+English | [中文](trust-audit.zh.md)
 
 The trust-audit seam of [dsh-trust-audit](../../packages/trust/trust-audit) records enterprise audit facts parallel to the session log. Records are never model-visible.
 

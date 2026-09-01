@@ -1,6 +1,6 @@
 # On-Prem Enterprise Deployment Hardening
 
-English
+English | [中文](on-prem-enterprise-hardening.zh.md)
 
 Guidance for single-tenant enterprise installs composing `@deepseek-ai/dsh-enterprise` over `dsh-base`.
 

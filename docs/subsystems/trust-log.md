@@ -1,6 +1,6 @@
 # Trust Log Integrity
 
-English
+English | [中文](trust-log.zh.md)
 
 The trust-log seam of [dsh-trust-log](../../packages/trust/trust-log) stores hash-chain integrity metadata beside durable session logs. Tampered sidecars or event sequences fail closed on verification.
 

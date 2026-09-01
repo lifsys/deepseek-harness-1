@@ -1,6 +1,6 @@
 # Trust Identity
 
-English
+English | [中文](trust-identity.zh.md)
 
 The trust-identity seam of [dsh-trust-identity](../../packages/trust/trust-identity) binds an authenticated enterprise principal to Host RPC and audit records. Anonymous preview profiles omit this service.
 
@@ -9,9 +9,13 @@ Source: [`packages/trust/trust-identity/src/index.ts`](../../packages/trust/trus
 ## Principal
 
 ```ts type-equiv
+/** Authenticated principal attached to Host RPC and audit records. */
 interface Principal {
+  /** Stable user identity from the identity provider. */
   readonly userId: UserId
+  /** Human-readable label for audit export; never used for authorization. */
   readonly displayName: string
+  /** Role names supplied by the identity provider or mapped locally. */
   readonly roles: readonly string[]
 }
 ```

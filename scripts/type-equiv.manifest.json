@@ -2010,6 +2010,16 @@
       "doc": "packages/client/ui-conversation/README.md",
       "symbol": "ComposerChainProps",
       "source": "packages/client/ui-conversation/src/client/contract/slots.ts"
+    },
+    {
+      "doc": "docs/subsystems/trust-identity.md",
+      "symbol": "Principal",
+      "source": "packages/trust/trust-identity/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/trust-authorization.md",
+      "symbol": "AuthorizationDecision",
+      "source": "packages/trust/trust-authorization/src/types.ts"
     }
   ]
 }

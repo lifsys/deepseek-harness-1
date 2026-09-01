@@ -1,6 +1,6 @@
 # DSH Control Map (Draft)
 
-English
+English | [中文](CONTROL-MAP.zh.md)
 
 This document maps common enterprise controls to DeepSeek Harness trust-core mechanisms. Status vocabulary: **BUILT**, **PLANNED**, **ABSENT**. This is not a certification claim.
 

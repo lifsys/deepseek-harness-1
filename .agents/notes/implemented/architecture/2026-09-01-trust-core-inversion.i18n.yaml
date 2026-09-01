@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/architecture/2026-09-01-trust-core-inversion.md
+2026-09-01-trust-core-inversion.md: 609cbaed394457d2d3c1289986db4a8ba3b30fcd
+2026-09-01-trust-core-inversion.zh.md: a36a09edcfea647f56e17e2d0bccf984eb9bbb52

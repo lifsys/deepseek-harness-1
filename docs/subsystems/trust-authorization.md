@@ -1,6 +1,6 @@
 # Trust Authorization
 
-English
+English | [中文](trust-authorization.zh.md)
 
 The trust-authorization seam of [dsh-trust-authorization](../../packages/trust/trust-authorization) evaluates RBAC before human approval or tool execution. Authorization decides whether a principal may be asked; [user-approval](../subsystems/approval.md) decides consent after authorization passes.
 
@@ -9,8 +9,11 @@ Source: [`packages/trust/trust-authorization/src/index.ts`](../../packages/trust
 ## Decision
 
 ```ts type-equiv
+/** One authorization decision. */
 interface AuthorizationDecision {
+  /** Whether the principal may perform the action. */
   readonly allowed: boolean
+  /** Closed reason when denied. */
   readonly reason?: AuthorizationDenialReason
 }
 ```
