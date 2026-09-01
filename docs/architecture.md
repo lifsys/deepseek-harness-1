@@ -139,5 +139,11 @@ New behavior attaches to a documented extension point. Changing the loop itself 
 | Manage a same-session objective | use `ctx.goals`; continue through `agent/*` |
 | Fork a live session | `ctx.sessions.fork(source, boundary?, childSessionId?)` |
 | Scope a registration to one agent | use that agent's `agent.ctx` |
+| Authenticate Host RPC callers | register `ctx.trustIdentity`; api-gateway calls `requirePrincipal()` |
+| Deny unauthorized tool execution | register `ctx.trustAuthorization`; RBAC guard on `tools/pre-execute` |
+| Verify tamper-evident session logs | register `ctx.trustLog`; fail-closed verify on load |
+| Export enterprise audit records | register `ctx.trustAudit`; file or OTLP providers |
+| Gate dynamic plugins with leases | register `ctx.trustLease`; cordis-host-runner checks before execute |
+| Admit signed enterprise bundles | register `ctx.trustAdmission`; app-boot validates at ready |
 
 The [extension cookbook](cookbook/extension-cookbook.md) maps features to capabilities and indexes the step-by-step guides for [packages](cookbook/adding-a-package.md), [tools](cookbook/adding-a-tool.md), [LLM adapters](cookbook/adding-an-llm-adapter.md), and [settings cards](cookbook/adding-a-settings-card.md). The [Conversation subsystem](subsystems/conversation.md) owns Chat-node assembly.

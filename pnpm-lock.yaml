@@ -1291,6 +1291,52 @@ importers:
         specifier: workspace:^
         version: link:../../runtime-diagnostics/invariants
 
+  packages/bundle/enterprise:
+    dependencies:
+      '@deepseek-ai/dsh-credentials-vault':
+        specifier: workspace:^
+        version: link:../../credentials/credentials-vault
+      '@deepseek-ai/dsh-trust-admission':
+        specifier: workspace:^
+        version: link:../../trust/trust-admission
+      '@deepseek-ai/dsh-trust-admission-boot':
+        specifier: workspace:^
+        version: link:../../trust/trust-admission-boot
+      '@deepseek-ai/dsh-trust-approval-audit':
+        specifier: workspace:^
+        version: link:../../trust/trust-approval-audit
+      '@deepseek-ai/dsh-trust-approval-grants':
+        specifier: workspace:^
+        version: link:../../trust/trust-approval-grants
+      '@deepseek-ai/dsh-trust-audit-file':
+        specifier: workspace:^
+        version: link:../../trust/trust-audit-file
+      '@deepseek-ai/dsh-trust-audit-otel':
+        specifier: workspace:^
+        version: link:../../trust/trust-audit-otel
+      '@deepseek-ai/dsh-trust-authorization-rbac':
+        specifier: workspace:^
+        version: link:../../trust/trust-authorization-rbac
+      '@deepseek-ai/dsh-trust-identity-oidc':
+        specifier: workspace:^
+        version: link:../../trust/trust-identity-oidc
+      '@deepseek-ai/dsh-trust-lease':
+        specifier: workspace:^
+        version: link:../../trust/trust-lease
+      '@deepseek-ai/dsh-trust-lease-runner':
+        specifier: workspace:^
+        version: link:../../trust/trust-lease-runner
+      '@deepseek-ai/dsh-trust-log-jsonl':
+        specifier: workspace:^
+        version: link:../../trust/trust-log-jsonl
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+
   packages/bundle/headless:
     dependencies:
       '@deepseek-ai/dsh-cmdline':
@@ -4453,6 +4499,25 @@ importers:
       '@deepseek-ai/dsh-launch-environment':
         specifier: workspace:^
         version: link:../../util/launch-environment
+
+  packages/credentials/credentials-vault:
+    dependencies:
+      '@deepseek-ai/schemastery':
+        specifier: link:../../../vendor/schemastery
+        version: link:../../../vendor/schemastery
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-credentials':
+        specifier: workspace:^
+        version: link:../credentials
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-audit':
+        specifier: workspace:^
+        version: link:../../trust/trust-audit
 
   packages/e2b/e2b:
     dependencies:
@@ -9318,6 +9383,253 @@ importers:
       '@deepseek-ai/dsh-user-questions':
         specifier: workspace:^
         version: link:../../interaction/user-questions
+
+  packages/trust/trust-admission:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:^
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+
+  packages/trust/trust-admission-boot:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-app-boot':
+        specifier: workspace:^
+        version: link:../../boot/app-boot
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-admission':
+        specifier: workspace:^
+        version: link:../trust-admission
+
+  packages/trust/trust-approval-audit:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-audit':
+        specifier: workspace:^
+        version: link:../trust-audit
+      '@deepseek-ai/dsh-user-approval':
+        specifier: workspace:^
+        version: link:../../interaction/user-approval
+
+  packages/trust/trust-approval-grants:
+    dependencies:
+      '@deepseek-ai/schemastery':
+        specifier: link:../../../vendor/schemastery
+        version: link:../../../vendor/schemastery
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-authorization':
+        specifier: workspace:^
+        version: link:../trust-authorization
+      '@deepseek-ai/dsh-trust-identity':
+        specifier: workspace:^
+        version: link:../trust-identity
+      '@deepseek-ai/dsh-user-approval':
+        specifier: workspace:^
+        version: link:../../interaction/user-approval
+
+  packages/trust/trust-audit:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:^
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-identity':
+        specifier: workspace:^
+        version: link:../trust-identity
+
+  packages/trust/trust-audit-file:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-atomic-write':
+        specifier: workspace:^
+        version: link:../../util/atomic-write
+      '@deepseek-ai/dsh-home-paths':
+        specifier: workspace:^
+        version: link:../../util/home-paths
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-audit':
+        specifier: workspace:^
+        version: link:../trust-audit
+
+  packages/trust/trust-audit-otel:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-session-telemetry':
+        specifier: workspace:^
+        version: link:../../session/session-telemetry
+      '@deepseek-ai/dsh-trust-audit':
+        specifier: workspace:^
+        version: link:../trust-audit
+
+  packages/trust/trust-authorization:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:^
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-identity':
+        specifier: workspace:^
+        version: link:../trust-identity
+
+  packages/trust/trust-authorization-rbac:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-tools':
+        specifier: workspace:^
+        version: link:../../core/tools
+      '@deepseek-ai/dsh-trust-authorization':
+        specifier: workspace:^
+        version: link:../trust-authorization
+      '@deepseek-ai/dsh-trust-identity':
+        specifier: workspace:^
+        version: link:../trust-identity
+
+  packages/trust/trust-gateway:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-api-gateway':
+        specifier: workspace:^
+        version: link:../../api/gateway
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-identity':
+        specifier: workspace:^
+        version: link:../trust-identity
+
+  packages/trust/trust-identity:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:^
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+
+  packages/trust/trust-identity-oidc:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:^
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-identity':
+        specifier: workspace:^
+        version: link:../trust-identity
+
+  packages/trust/trust-lease:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:^
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+
+  packages/trust/trust-lease-runner:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-cordis-host-runner':
+        specifier: workspace:^
+        version: link:../../extensions/cordis-host-runner
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-lease':
+        specifier: workspace:^
+        version: link:../trust-lease
+
+  packages/trust/trust-log:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-brand':
+        specifier: workspace:^
+        version: link:../../util/brand
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-session':
+        specifier: workspace:^
+        version: link:../../core/session
+
+  packages/trust/trust-log-jsonl:
+    devDependencies:
+      '@deepseek-ai/cordis':
+        specifier: workspace:^
+        version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-invariants':
+        specifier: workspace:^
+        version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-session':
+        specifier: workspace:^
+        version: link:../../core/session
+      '@deepseek-ai/dsh-session-persistence':
+        specifier: workspace:^
+        version: link:../../session/session-persistence
+      '@deepseek-ai/dsh-trust-log':
+        specifier: workspace:^
+        version: link:../trust-log
 
   packages/typert/generator:
     dependencies:

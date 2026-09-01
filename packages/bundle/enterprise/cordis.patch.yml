@@ -1,0 +1,72 @@
+# The dsh-enterprise bundle patch: opt-in trust core over dsh-base.
+# Default web and headless profiles do not include these rows.
+
+- insert:
+    - id: trust-identity
+      name: '@deepseek-ai/dsh-trust-identity-oidc'
+      config:
+        staticBindings:
+          - token: enterprise-admin-token
+            principal:
+              userId: admin-1
+              displayName: Enterprise Admin
+              roles: [admin]
+          - token: enterprise-dev-token
+            principal:
+              userId: dev-1
+              displayName: Enterprise Developer
+              roles: [developer]
+
+    - id: trust-authorization
+      name: '@deepseek-ai/dsh-trust-authorization-rbac'
+      config:
+        roles:
+          - role: admin
+            permissions: ['*']
+          - role: developer
+            permissions: ['tool:Read', 'tool:Grep', 'tool:Glob', 'tool:Shell']
+          - role: auditor
+            permissions: ['audit:export']
+          - role: agent-user
+            permissions: ['tool:*']
+        denyTools: [danger-full-access]
+
+    - id: trust-log
+      name: '@deepseek-ai/dsh-trust-log-jsonl'
+      config:
+        root: !!js ctx.dshHomePath('trust-log')
+
+    - id: trust-audit
+      name: '@deepseek-ai/dsh-trust-audit-file'
+
+    - id: trust-audit-otel
+      name: '@deepseek-ai/dsh-trust-audit-otel'
+
+    - id: trust-approval-audit
+      name: '@deepseek-ai/dsh-trust-approval-audit'
+
+    - id: trust-lease
+      name: '@deepseek-ai/dsh-trust-lease'
+
+    - id: trust-admission
+      name: '@deepseek-ai/dsh-trust-admission'
+
+    - id: trust-admission-boot
+      name: '@deepseek-ai/dsh-trust-admission-boot'
+
+    - id: trust-lease-runner
+      name: '@deepseek-ai/dsh-trust-lease-runner'
+
+    - id: trust-approval-grants
+      name: '@deepseek-ai/dsh-trust-approval-grants'
+
+    - id: credentials-vault
+      name: '@deepseek-ai/dsh-credentials-vault'
+      disabled: true
+      config:
+        address: https://vault.example.com
+        mountPath: secret/data/dsh
+        tokenRef: VAULT_TOKEN
+
+- id: credentials-local
+  disabled: false

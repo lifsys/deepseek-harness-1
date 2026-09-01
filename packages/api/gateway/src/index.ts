@@ -593,6 +593,8 @@ export class TypertGatewayService extends Service implements TypertGateway {
 
   private async invokeRpc(endpoint: string, payload: unknown, signal: AbortSignal): Promise<ConnectionRpcResult> {
     try {
+      const identity = this.ctx.get('trustIdentity')
+      identity?.requirePrincipal()
       const value = await this.invoke(remoteRequest(endpoint, payload, signal))
       // A void or explicitly absent business result carries no `value` field;
       // JSON has no `undefined`, and the envelope's optional slot is the one
@@ -1001,6 +1003,16 @@ function rpcFailure(error: unknown): ConnectionRpcResult {
       error: { code: 'cancelled', message: error.message, details: {} },
     }
   }
+  if (isUnauthorizedError(error)) {
+    return {
+      ok: false,
+      error: {
+        code: 'unauthorized',
+        message: error instanceof Error ? error.message : 'authentication required',
+        details: {},
+      },
+    }
+  }
   if (error instanceof TypertLookupFailure) {
     return { ok: false, error: error.failure as ConnectionRpcError }
   }
@@ -1023,6 +1035,12 @@ function rpcError(error: unknown): ConnectionRpcError & RemoteStreamFailure {
 
 function endpointOf(namespace: string, method: string): string {
   return `${namespace}/${method}`
+}
+
+function isUnauthorizedError(error: unknown): boolean {
+  return error instanceof Error
+    && (error.name === 'TrustIdentityUnauthorizedError'
+      || (error as { code?: unknown }).code === 'unauthorized')
 }
 
 function validateBinding(
