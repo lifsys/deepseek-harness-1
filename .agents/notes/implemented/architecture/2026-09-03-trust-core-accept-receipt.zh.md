@@ -30,7 +30,7 @@ Status: implemented
 | 企业密钥策略：不得让 `credentials-vault` 禁用而本地存储仍然在线 | PASS | `packages/bundle/enterprise/cordis.patch.yml`——Vault 行已启用并由 operator 配置；base 的 `credentials` 行已禁用。此前的补丁还重新启用了 `dsh-base` 并未声明的行 id（`credentials-local`），因此那次禁用根本没有指向对象。 |
 | 租约门控可配置，而非编译进代码 | PASS | `pnpm exec vitest run packages/trust/trust-lease-runner`——`gatedTools` 与 `budgetMs` 是受校验的 config；未门控工具绕过门控，门控工具在被见证的租约下运行并释放它，无法见证的租约则拒绝。 |
 | 准入不能静默放行 | PASS | `pnpm exec vitest run packages/trust/trust-admission-boot`——空的 `expected` 列表拒绝加载；摘要不匹配与未知 bundle 均被拒绝。企业补丁默认关闭该行，因为准入摘要因站点而异。 |
-| 上游推送或 PR | FAIL——该 operator 只读 | `git push --dry-run upstream feature/trust-core` → `ERROR: Permission to deepseek-ai/deepseek-harness.git denied to lifsys.` 没有任何上游 pull request 处于打开状态。 |
+| 上游推送或 PR | FAIL——该 operator 只读 | `git push --dry-run upstream feature/trust-core` → `ERROR: Permission to deepseek-ai/deepseek-harness.git denied to lifsys.` `gh pr create --repo deepseek-ai/deepseek-harness --base master --head lifsys:feature/trust-core` → `GraphQL: lifsys does not have the correct permissions to execute CreatePullRequest`。没有任何上游 pull request 处于打开状态。 |
 
 ### Gate 结果
 
@@ -53,7 +53,9 @@ Status: implemented
 
 ### 发布
 
-Forgejo（`origin` 与 `forgejo`，`ssh://git@repo.lifsys.one:2222/lifsys/deepseek-harness.git`）承载 `feature/trust-core`。GitHub fork `lifsys/deepseek-harness-1` 承载同一分支。供维护者开 pull request 的上游对比：<https://github.com/deepseek-ai/deepseek-harness/compare/master...lifsys:deepseek-harness-1:feature/trust-core>。
+Forgejo（`origin` 与 `forgejo`，`ssh://git@repo.lifsys.one:2222/lifsys/deepseek-harness.git`）承载 `feature/trust-core`，提交为 `48efefaa4b`，上述每条判定都在该提交上测得；本次收据更新是紧随其后的提交。GitHub fork `lifsys/deepseek-harness-1` 承载同一分支与同一提交。供维护者开 pull request 的上游对比：<https://github.com/deepseek-ai/deepseek-harness/compare/master...lifsys:deepseek-harness-1:feature/trust-core>。
+
+上游贡献的上报路径：分支已发布且可从 fork 评审，因此 `deepseek-ai/deepseek-harness` 的维护者，或任何在该仓库拥有 pull request 权限的账号，都可以从上面的对比链接开 pull request。本仓库内的任何改动都无法关闭这一步。
 
 ## Alternatives considered
 

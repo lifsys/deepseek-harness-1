@@ -30,7 +30,7 @@ This note is that record. Every row names the command that produced its verdict;
 | Enterprise secrets policy: no `credentials-vault` disabled beside a live local store | PASS | `packages/bundle/enterprise/cordis.patch.yml` — the Vault row is enabled and operator-configured; the base `credentials` row is disabled. The previous patch also re-enabled a row id (`credentials-local`) that `dsh-base` does not declare, so the disable had no referent at all. |
 | Lease gating is configurable, not compiled in | PASS | `pnpm exec vitest run packages/trust/trust-lease-runner` — `gatedTools` and `budgetMs` are validated config; an ungated tool bypasses the gate, a gated tool runs under a witnessed lease and releases it, and an unwitnessable lease denies. |
 | Admission cannot admit silently | PASS | `pnpm exec vitest run packages/trust/trust-admission-boot` — an empty `expected` list refuses to load; a digest mismatch and an unknown bundle both reject. The enterprise patch ships the row disabled because admitted digests are site-specific. |
-| Upstream push or PR | FAIL — read-only for this operator | `git push --dry-run upstream feature/trust-core` → `ERROR: Permission to deepseek-ai/deepseek-harness.git denied to lifsys.` No upstream pull request is open. |
+| Upstream push or PR | FAIL — read-only for this operator | `git push --dry-run upstream feature/trust-core` → `ERROR: Permission to deepseek-ai/deepseek-harness.git denied to lifsys.` `gh pr create --repo deepseek-ai/deepseek-harness --base master --head lifsys:feature/trust-core` → `GraphQL: lifsys does not have the correct permissions to execute CreatePullRequest`. No upstream pull request is open. |
 
 ### Gate results
 
@@ -53,7 +53,9 @@ Eight `scripts/` suites that spawn subprocesses or sweep the whole workspace (`p
 
 ### Publication
 
-Forgejo (`origin` and `forgejo`, `ssh://git@repo.lifsys.one:2222/lifsys/deepseek-harness.git`) carries `feature/trust-core`. The GitHub fork `lifsys/deepseek-harness-1` carries the same branch. Upstream comparison for a maintainer-opened pull request: <https://github.com/deepseek-ai/deepseek-harness/compare/master...lifsys:deepseek-harness-1:feature/trust-core>.
+Forgejo (`origin` and `forgejo`, `ssh://git@repo.lifsys.one:2222/lifsys/deepseek-harness.git`) carries `feature/trust-core` at `48efefaa4b`, the commit every verdict above was measured on; this receipt update is the commit that follows it. The GitHub fork `lifsys/deepseek-harness-1` carries the same branch and commit. Upstream comparison for a maintainer-opened pull request: <https://github.com/deepseek-ai/deepseek-harness/compare/master...lifsys:deepseek-harness-1:feature/trust-core>.
+
+Escalation for the upstream contribution: the branch is published and reviewable from the fork, so a `deepseek-ai/deepseek-harness` maintainer, or any account with pull-request permission on that repository, can open the pull request from the comparison link above. Nothing in this repository can close that step.
 
 ## Alternatives considered
 
