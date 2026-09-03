@@ -588,6 +588,34 @@ export interface Config {
 
 来源：[`packages/credentials/credentials-local/src/index.ts:64`](../packages/credentials/credentials-local/src/index.ts)
 
+<a id="deepseek-aidsh-credentials-vault"></a>
+
+## `@deepseek-ai/dsh-credentials-vault`
+
+```ts config-catalog
+/** Plugin configuration. */
+export interface Config {
+  /** Vault server address, for example `https://vault.example.com`. */
+  readonly address: string
+  /** KV v2 mount path prefix before `/data/<secret path>`. */
+  readonly mountPath: string
+  /** Environment variable name holding the Vault token. */
+  readonly tokenRef: string
+  /**
+   * Optional HTTP client override for tests. Production uses global `fetch`.
+   * Not accepted from cordis.yml — only programmatic plugin config.
+   */
+  readonly fetch?: VaultFetch
+  /** Request timeout in milliseconds. @default 5000 */
+  readonly timeoutMs?: number
+}
+
+/** Fetch-compatible HTTP client used by the Vault provider. */
+export type VaultFetch = (input: string, init?: RequestInit) => Promise<Response>
+```
+
+来源：[`packages/credentials/credentials-vault/src/index.ts:30`](../packages/credentials/credentials-vault/src/index.ts)
+
 <a id="deepseek-aidsh-e2b"></a>
 
 ## `@deepseek-ai/dsh-e2b`
@@ -3154,6 +3182,211 @@ export type ToolPresentationMode = 'native' | 'ptc' | 'both'
 
 来源：[`packages/core/tools/src/index.ts:655`](../packages/core/tools/src/index.ts)
 
+<a id="deepseek-aidsh-trust-admission"></a>
+
+## `@deepseek-ai/dsh-trust-admission`
+
+```ts config-catalog
+/** Plugin configuration. */
+export interface Config {
+  /** Known-good manifest digests keyed by bundle id. */
+  readonly manifests: readonly AdmissionManifest[]
+  /** When true, unsigned rows refuse load. */
+  readonly requireSignature?: boolean
+}
+
+/** One signed bundle manifest row. */
+export interface AdmissionManifest {
+  /** Bundle package name the row admits. */
+  readonly id: string
+  /** SHA-256 hex digest of the admitted bundle manifest. */
+  readonly digest: string
+  /** Detached signature over the digest, when the installation signs manifests. */
+  readonly signature?: string
+}
+```
+
+来源：[`packages/trust/trust-admission/src/index.ts:33`](../packages/trust/trust-admission/src/index.ts)
+
+<a id="deepseek-aidsh-trust-admission-boot"></a>
+
+## `@deepseek-ai/dsh-trust-admission-boot`
+
+需要：`trustAdmission`
+
+```ts config-catalog
+/** Expected manifest rows validated during plugin apply. */
+export interface Config {
+  /** Bundle manifests this installation admits; an empty list is refused. */
+  readonly expected: readonly AdmissionManifest[]
+}
+```
+
+依赖：[`AdmissionManifest`](subsystems/trust-authorization.zh.md)
+
+来源：[`packages/trust/trust-admission-boot/src/index.ts:14`](../packages/trust/trust-admission-boot/src/index.ts)
+
+<a id="deepseek-aidsh-trust-approval-grants"></a>
+
+## `@deepseek-ai/dsh-trust-approval-grants`
+
+需要：`trustAuthorization` · `trustIdentity`
+
+```ts config-catalog
+/** Plugin configuration for preloaded admin approval grants. */
+export interface Config {
+  /** Grants honored until `expiresAt` for the named principal and tool. */
+  readonly grants: readonly ApprovalGrant[]
+}
+
+/** One stored approval grant scoped to admin policy. */
+export interface ApprovalGrant {
+  /** Tool the grant pre-approves. */
+  readonly toolName: string
+  /** Principal the grant applies to. */
+  readonly principalId: string
+  /** Epoch milliseconds after which the grant stops applying. */
+  readonly expiresAt: number
+}
+```
+
+来源：[`packages/trust/trust-approval-grants/src/index.ts:24`](../packages/trust/trust-approval-grants/src/index.ts)
+
+<a id="deepseek-aidsh-trust-audit-cli"></a>
+
+## `@deepseek-ai/dsh-trust-audit-cli`
+
+需要：`trustAudit`
+
+```ts config-catalog
+/** Plugin config: the export request resolved from this app's provider service. */
+export interface Config {
+  /** Destination sink the mounted provider serializes for. */
+  sink: TrustAuditSink
+  /** Lower bound on record time in epoch milliseconds. */
+  since?: number
+  /** Upper bound on record time in epoch milliseconds. */
+  until?: number
+  /** Record types to keep; every type when absent. */
+  types?: readonly string[]
+  /** Principal whose records to keep; every principal when absent. */
+  userId?: string
+  /** File the payload is written to; stdout when absent. */
+  out?: string
+}
+```
+
+依赖：[`TrustAuditSink`](subsystems/trust-audit.zh.md)
+
+来源：[`packages/bundle/trust-audit-cli/src/index.ts:26`](../packages/bundle/trust-audit-cli/src/index.ts)
+
+<a id="deepseek-aidsh-trust-audit-file"></a>
+
+## `@deepseek-ai/dsh-trust-audit-file`
+
+```ts config-catalog
+/** Plugin configuration. */
+export interface Config {
+  /** Audit log directory; defaults to `$DSH_HOME/trust-audit`. */
+  readonly path?: string
+}
+```
+
+来源：[`packages/trust/trust-audit-file/src/index.ts:19`](../packages/trust/trust-audit-file/src/index.ts)
+
+<a id="deepseek-aidsh-trust-authorization-rbac"></a>
+
+## `@deepseek-ai/dsh-trust-authorization-rbac`
+
+```ts config-catalog
+/** Plugin configuration. */
+export interface Config {
+  /** Role permission table; no hidden defaults — every role must be declared. */
+  readonly roles: readonly RolePermissions[]
+  /** Actions denied even when a permission would allow them. */
+  readonly denyTools: readonly string[]
+}
+
+/** One role→permission mapping entry. Permission strings accept `*` or `tool:<name>` patterns. */
+export interface RolePermissions {
+  /** Role name matched against a principal's roles. */
+  readonly role: string
+  /** Permission patterns the role grants. */
+  readonly permissions: readonly string[]
+}
+```
+
+来源：[`packages/trust/trust-authorization-rbac/src/index.ts:31`](../packages/trust/trust-authorization-rbac/src/index.ts)
+
+<a id="deepseek-aidsh-trust-identity-oidc"></a>
+
+## `@deepseek-ai/dsh-trust-identity-oidc`
+
+```ts config-catalog
+/** Plugin configuration. */
+export interface Config {
+  /** OIDC issuer URL; required unless `staticBindings` supplies every principal. */
+  readonly issuer?: string
+  /** OAuth client id registered with the issuer. */
+  readonly clientId?: string
+  /** Expected JWT audience when validating issuer-issued access tokens. */
+  readonly audience?: string
+  /** Static token map for test and bootstrap modes. */
+  readonly staticBindings?: readonly StaticPrincipalBinding[]
+}
+
+/** Static principal binding for tests and air-gapped bootstrap. */
+export interface StaticPrincipalBinding {
+  /** Bearer token presented by the client. */
+  readonly token: string
+  /** Principal returned when the token matches. */
+  readonly principal: {
+    /** Stable user identifier recorded in audit rows. */
+    readonly userId: string
+    /** Human-readable name shown in operator surfaces. */
+    readonly displayName: string
+    /** Roles the RBAC provider evaluates for this principal. */
+    readonly roles: readonly string[]
+  }
+}
+```
+
+来源：[`packages/trust/trust-identity-oidc/src/index.ts:46`](../packages/trust/trust-identity-oidc/src/index.ts)
+
+<a id="deepseek-aidsh-trust-lease-runner"></a>
+
+## `@deepseek-ai/dsh-trust-lease-runner`
+
+需要：`trustLease`
+
+```ts config-catalog
+/** Plugin configuration. */
+export interface Config {
+  /** Tool names that need a live `dynamic-plugin` lease before they execute. */
+  readonly gatedTools: readonly string[]
+  /** Lease lifetime granted for one gated execution, in milliseconds. */
+  readonly budgetMs: number
+}
+```
+
+来源：[`packages/trust/trust-lease-runner/src/index.ts:15`](../packages/trust/trust-lease-runner/src/index.ts)
+
+<a id="deepseek-aidsh-trust-log-jsonl"></a>
+
+## `@deepseek-ai/dsh-trust-log-jsonl`
+
+需要：`sessions`
+
+```ts config-catalog
+/** Plugin configuration. */
+export interface Config {
+  /** Directory storing `<sessionId>.chain.jsonl` sidecars. */
+  readonly root: string
+}
+```
+
+来源：[`packages/trust/trust-log-jsonl/src/index.ts:22`](../packages/trust/trust-log-jsonl/src/index.ts)
+
 <a id="deepseek-aidsh-typert-loader"></a>
 
 ## `@deepseek-ai/dsh-typert-loader`
@@ -3454,6 +3687,7 @@ export interface Config {
 - `@deepseek-ai/dsh-commands`（[`packages/interaction/commands/src/index.ts`](../packages/interaction/commands/src/index.ts)）
 - `@deepseek-ai/dsh-cordis-client-runner`（[`packages/extensions/cordis-client-runner/src/index.ts`](../packages/extensions/cordis-client-runner/src/index.ts)）
 - `@deepseek-ai/dsh-deepseek-llm-api-extensions`（[`packages/llm/deepseek-llm-api-extensions/src/index.ts`](../packages/llm/deepseek-llm-api-extensions/src/index.ts)）
+- `@deepseek-ai/dsh-enterprise` — 需要 `invariants`（[`packages/bundle/enterprise/src/index.ts`](../packages/bundle/enterprise/src/index.ts)）
 - `@deepseek-ai/dsh-experimental-client-ui-agent-team`（[`packages/experimental/client-ui-agent-team/src/index.ts`](../packages/experimental/client-ui-agent-team/src/index.ts)）
 - `@deepseek-ai/dsh-fs-e2b` — 需要 `e2b`（[`packages/e2b/fs-e2b/src/index.ts`](../packages/e2b/fs-e2b/src/index.ts)）
 - `@deepseek-ai/dsh-fs-observation-policy`（[`packages/fs/fs-observation-policy/src/index.ts`](../packages/fs/fs-observation-policy/src/index.ts)）
@@ -3477,6 +3711,10 @@ export interface Config {
 - `@deepseek-ai/dsh-tool-call-timeout-policy` — 需要 `tools`（[`packages/guard/timeout-policy/src/index.ts`](../packages/guard/timeout-policy/src/index.ts)）
 - `@deepseek-ai/dsh-tool-cordis` — 需要 `tools` · `systemPrompt` · `dynamicCordisRunner` · `cordisInspect`（[`packages/extensions/tool-cordis/src/index.ts`](../packages/extensions/tool-cordis/src/index.ts)）
 - `@deepseek-ai/dsh-tool-subagent-control` — 需要 `tools` · `subagents`（[`packages/subagent/tool-subagent-control/src/index.ts`](../packages/subagent/tool-subagent-control/src/index.ts)）
+- `@deepseek-ai/dsh-trust-approval-audit` — 需要 `trustAudit` · `trustIdentity`（[`packages/trust/trust-approval-audit/src/index.ts`](../packages/trust/trust-approval-audit/src/index.ts)）
+- `@deepseek-ai/dsh-trust-audit-otel` — 需要 `sessionTelemetry`（[`packages/trust/trust-audit-otel/src/index.ts`](../packages/trust/trust-audit-otel/src/index.ts)）
+- `@deepseek-ai/dsh-trust-gateway` — 需要 `trustIdentity`（[`packages/trust/trust-gateway/src/index.ts`](../packages/trust/trust-gateway/src/index.ts)）
+- `@deepseek-ai/dsh-trust-lease`（[`packages/trust/trust-lease/src/index.ts`](../packages/trust/trust-lease/src/index.ts)）
 - `@deepseek-ai/dsh-user-questions`（[`packages/interaction/user-questions/src/index.ts`](../packages/interaction/user-questions/src/index.ts)）
 - `@deepseek-ai/dsh-webhook` — 需要 `agents` · `agentDefaultModel` · `agentPresets` · `permissionPresets` · `sessionTitle` · `workspaceRegistry`（[`packages/webhook/webhook/src/index.ts`](../packages/webhook/webhook/src/index.ts)）
 - `@deepseek-ai/dsh-workspace` — 需要 `storageDomain` · `sessionPersistence`（[`packages/workspace/workspace/src/index.ts`](../packages/workspace/workspace/src/index.ts)）
@@ -3500,6 +3738,10 @@ export interface Config {
 - `@deepseek-ai/dsh-shell` — 抽象 `ShellExecutor`（[`packages/shell/shell/src/index.ts`](../packages/shell/shell/src/index.ts)）
 - `@deepseek-ai/dsh-spill` — 抽象 `SpillStore`（[`packages/spill/spill/src/index.ts`](../packages/spill/spill/src/index.ts)）
 - `@deepseek-ai/dsh-subprocess` — 抽象 `SubprocessRuntime`（[`packages/subprocess/subprocess/src/index.ts`](../packages/subprocess/subprocess/src/index.ts)）
+- `@deepseek-ai/dsh-trust-audit` — 抽象 `TrustAuditProvider`（[`packages/trust/trust-audit/src/index.ts`](../packages/trust/trust-audit/src/index.ts)）
+- `@deepseek-ai/dsh-trust-authorization` — 抽象 `TrustAuthorizationProvider`（[`packages/trust/trust-authorization/src/index.ts`](../packages/trust/trust-authorization/src/index.ts)）
+- `@deepseek-ai/dsh-trust-identity` — 抽象 `TrustIdentityProvider`（[`packages/trust/trust-identity/src/index.ts`](../packages/trust/trust-identity/src/index.ts)）
+- `@deepseek-ai/dsh-trust-log` — 抽象 `TrustLogProvider`（[`packages/trust/trust-log/src/index.ts`](../packages/trust/trust-log/src/index.ts)）
 - `@deepseek-ai/dsh-workflow` — 抽象 `WorkflowEngine`（[`packages/workflow/workflow/src/index.ts`](../packages/workflow/workflow/src/index.ts)）
 ## 库包（无插件入口）
 

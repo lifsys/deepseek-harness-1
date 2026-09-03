@@ -28,6 +28,8 @@ kind: "package-group"
 | [`headless`](headless/README.zh.md) | 基于 base 的一次性命令行任务应用 | `headless-runner` |
 | [`sdk-app`](sdk-app/README.zh.md) | 基于 base 的 SDK JSON-RPC stdio 应用 | 挂载 SDK server |
 | [`sdk-minimal`](sdk-minimal/README.zh.md) | 不使用 base 或 Web 的独立极简 SDK 应用 | —（完整 patch 树） |
+| [`enterprise`](enterprise/README.zh.md) | 面向 on-prem 企业 profile 的 base 之上 trust-core 层 | 挂载 trust 配置项 |
+| [`trust-audit-cli`](trust-audit-cli/README.zh.md) | 基于 base 的一次性审计导出应用 | `trust-audit-export` |
 
 内置组合包从 dsh 安装目录解析；树外（out-of-tree）组合包通过 `dsh plugin --profile <name> add <package>` 安装进 profile。
 

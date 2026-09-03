@@ -2550,6 +2550,153 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'trustAdmission',
+    summary: 'Abstract admission service.',
+    description: 'Abstract admission service.',
+    methods: [
+      {
+        signature: 'abstract validateComposition(manifests: readonly AdmissionManifest[]): void',
+        description: 'Validate one composition tree before profile mount completes.',
+        parameters: [{ name: 'manifests', description: 'candidate bundle manifests.' }],
+        throws: ['{@link TrustAdmissionRejectedError} on unsigned or digest mismatch.'],
+      },
+    ],
+  },
+  {
+    key: 'trustAudit',
+    summary: 'Abstract audit service.',
+    description: 'Abstract audit service.',
+    methods: [
+      {
+        signature: 'abstract record(record: TrustAuditRecord): Promise<void>',
+        description: 'Append one audit record to every configured sink.',
+        parameters: [{ name: 'record', description: 'durable audit fact.' }],
+      },
+      {
+        signature: 'abstract export(sink: TrustAuditSink, filter?: TrustAuditFilter): Promise<string>',
+        description: 'Export matching records to one sink.',
+        parameters: [{ name: 'sink', description: 'destination sink id.' }, { name: 'filter', description: 'optional time and type filter.' }],
+        returns: 'serialized export payload for CLI and operators.',
+      },
+      {
+        signature: 'abstract subscribe(listener: (record: TrustAuditRecord) => void): () => void',
+        description: 'Subscribe one in-process sink for live records.',
+        parameters: [{ name: 'listener', description: 'receives each committed record.' }],
+        returns: 'disposer removing the listener.',
+      },
+    ],
+  },
+  {
+    key: 'trustAuthorization',
+    summary: 'Abstract authorization service.',
+    description: 'Abstract authorization service.',
+    methods: [
+      {
+        signature: 'abstract authorize( principal: Principal, action: TrustAction, resource: TrustResource, ): AuthorizationDecision',
+        description: 'Evaluate one principal against an action and resource.',
+        parameters: [{ name: 'principal', description: 'authenticated principal; unauthenticated callers must fail closed upstream.' }, { name: 'action', description: 'requested action.' }, { name: 'resource', description: 'target resource identifier.' }],
+        returns: 'allow/deny decision with closed reason when denied.',
+      },
+      {
+        signature: 'abstract effectiveRoles(principal: Principal): readonly string[]',
+        description: 'Resolve effective role names for one principal.',
+        parameters: [{ name: 'principal', description: 'authenticated principal.' }],
+        returns: 'role names used for permission lookup.',
+      },
+      {
+        signature: 'require( principal: Principal, action: TrustAction, resource: TrustResource, ): void',
+        description: 'Require authorization for one action; throws on denial.',
+        parameters: [{ name: 'principal', description: 'authenticated principal.' }, { name: 'action', description: 'requested action.' }, { name: 'resource', description: 'target resource.' }],
+        throws: ['{@link TrustAuthorizationDeniedError} when denied.'],
+      },
+    ],
+  },
+  {
+    key: 'trustIdentity',
+    summary: 'Abstract identity service.',
+    description: 'Abstract identity service. Providers authenticate ingress credentials and maintain the current principal for the active Host request scope.',
+    methods: [
+      {
+        signature: 'abstract authenticate(request: AuthRequest): Promise<AuthSession | undefined>',
+        description: 'Exchange one ingress credential for an authenticated principal.',
+        parameters: [{ name: 'request', description: 'provider credential material.' }],
+        returns: 'the authenticated session, or `undefined` when the credential is invalid.',
+      },
+      {
+        signature: 'abstract currentPrincipal(): Principal | undefined',
+        description: 'Return the principal bound to the current Host request scope.',
+        parameters: [],
+        returns: 'the active principal, or `undefined` while unauthenticated.',
+      },
+      {
+        signature: 'requirePrincipal(): Principal',
+        description: 'Require an authenticated principal for the current Host request scope.',
+        parameters: [],
+        returns: 'the active principal.',
+        throws: ['{@link TrustIdentityUnauthorizedError} when no principal is bound.'],
+      },
+      {
+        signature: 'abstract withPrincipal<T>(principal: Principal, run: () => T | Promise<T>): Promise<T>',
+        description: 'Bind one principal to the current async execution context for downstream RPC.',
+        parameters: [{ name: 'principal', description: 'authenticated principal to attach.' }, { name: 'run', description: 'work executed while the principal remains bound.' }],
+        returns: 'the result of `run`.',
+      },
+    ],
+  },
+  {
+    key: 'trustLease',
+    summary: 'Abstract lease service.',
+    description: 'Abstract lease service.',
+    methods: [
+      {
+        signature: 'abstract acquire(scope: LeaseScope, budgetMs: number): Promise<CapabilityLease>',
+        description: 'Acquire one scoped lease.',
+        parameters: [{ name: 'scope', description: 'capability scope.' }, { name: 'budgetMs', description: 'lease lifetime in milliseconds.' }],
+        returns: 'active lease with fencing token.',
+      },
+      {
+        signature: 'abstract witness(lease: CapabilityLease): boolean',
+        description: 'Witness one effect against an active lease.',
+        parameters: [{ name: 'lease', description: 'lease presented by the caller.' }],
+        returns: 'true when the lease remains valid.',
+      },
+      {
+        signature: 'abstract revoke(leaseId: LeaseId): Promise<void>',
+        description: 'Revoke one lease immediately.',
+        parameters: [{ name: 'leaseId', description: 'lease to revoke.' }],
+      },
+    ],
+  },
+  {
+    key: 'trustLog',
+    summary: 'Abstract trust-log service wrapping durable session persistence.',
+    description: 'Abstract trust-log service wrapping durable session persistence.',
+    methods: [
+      {
+        signature: 'abstract verifySession(sessionId: SessionId): Promise<void>',
+        description: 'Verify one session\'s hash chain against its durable event log.',
+        parameters: [{ name: 'sessionId', description: 'session to verify.' }],
+        throws: ['{@link TrustLogTamperedError} when the chain does not match.'],
+      },
+      {
+        signature: 'abstract extendChain(sessionId: SessionId, events: readonly SessionEvent[]): Promise<void>',
+        description: 'Append integrity metadata for one newly persisted event batch.',
+        parameters: [{ name: 'sessionId', description: 'owning session.' }, { name: 'events', description: 'contiguous events appended in this flush.' }],
+      },
+      {
+        signature: 'abstract exportVerified(sessionId: SessionId): Promise<VerifiedSessionExport>',
+        description: 'Export the verified chain for one session.',
+        parameters: [{ name: 'sessionId', description: 'session to export.' }],
+        returns: 'verified link list after {@link verifySession} succeeds.',
+      },
+      {
+        signature: 'abstract checkpoint(sessionId: SessionId): Promise<void>',
+        description: 'Write an optional signed checkpoint for long-running sessions.',
+        parameters: [{ name: 'sessionId', description: 'session receiving the checkpoint.' }],
+      },
+    ],
+  },
+  {
     key: 'typert',
     summary: 'Registry of generated schemas, package reflection, invocations, and Remote dependency providers.',
     description: 'Registry of generated schemas, package reflection, invocations, and Remote dependency providers.',
@@ -3387,6 +3534,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface AdapterRegistrationHandle {\n    (): void;\n    replace(providers: string[]): void;\n}',
   },
   {
+    name: 'AdmissionManifest',
+    declaration: 'export interface AdmissionManifest {\n    readonly id: string;\n    readonly digest: string;\n    readonly signature?: string;\n}',
+  },
+  {
     name: 'Agent',
     declaration: 'export interface Agent {\n    readonly id: SessionId;\n}',
   },
@@ -3519,6 +3670,14 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export type AttachmentId = Branded<\'AttachmentId\'>;',
   },
   {
+    name: 'AuthorizationDecision',
+    declaration: 'export interface AuthorizationDecision {\n    readonly allowed: boolean;\n    readonly reason?: AuthorizationDenialReason;\n}',
+  },
+  {
+    name: 'AuthorizationDenialReason',
+    declaration: 'export type AuthorizationDenialReason = \'unauthenticated\' | \'unknown-role\' | \'permission-denied\' | \'resource-denied\';',
+  },
+  {
     name: 'AuthorizationEntry',
     declaration: 'export interface AuthorizationEntry {\n    key: CredentialKey;\n    label: string;\n    methods: readonly AuthorizationMethod[];\n    inFlight: boolean;\n}',
   },
@@ -3567,6 +3726,14 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export type AuthorizationStatus = \'authorized\' | \'cancelled\';',
   },
   {
+    name: 'AuthRequest',
+    declaration: 'export interface AuthRequest {\n    readonly credential: string;\n    readonly provider?: IdentityProviderRef;\n}',
+  },
+  {
+    name: 'AuthSession',
+    declaration: 'export interface AuthSession {\n    readonly principal: Principal;\n    readonly providerSessionId?: string;\n}',
+  },
+  {
     name: 'BackendRegistry',
     declaration: 'export class BackendRegistry {\n    register(name: string, backend: StorageBackend): () => void;\n    get(name: string): StorageBackend;\n    names(): string[];\n}',
   },
@@ -3589,6 +3756,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'Branded',
     declaration: 'export type Branded<B extends string> = string & {\n    readonly [BRAND]: B;\n};',
+  },
+  {
+    name: 'CapabilityLease',
+    declaration: 'export interface CapabilityLease {\n    readonly id: LeaseId;\n    readonly scope: LeaseScope;\n    readonly fencingToken: number;\n    readonly expiresAt: number;\n}',
   },
   {
     name: 'ChunkRowEvent',
@@ -4083,6 +4254,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface GrantRecord {\n    readonly kind: \'grant\';\n    readonly payload: unknown;\n}',
   },
   {
+    name: 'IdentityProviderRef',
+    declaration: 'export type IdentityProviderRef = Branded<\'IdentityProviderRef\'>;',
+  },
+  {
     name: 'ImageAttachmentLimits',
     declaration: 'export interface ImageAttachmentLimits {\n    maxImageBytes: number;\n    maxImagesPerMessage: number;\n    maxMessageImageBytes: number;\n    maxImagePixels: number;\n    maxImageDimension: number;\n    mediaTypes: readonly ImageMediaType[];\n}',
   },
@@ -4233,6 +4408,14 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'KvUnitDescriptor',
     declaration: 'export interface KvUnitDescriptor {\n    readonly name: string;\n    readonly version: number;\n    readonly tables: readonly string[];\n    readonly hasGlobal: boolean;\n    readonly layout?: \'single\' | \'per-record\';\n}',
+  },
+  {
+    name: 'LeaseId',
+    declaration: 'export type LeaseId = Branded<\'LeaseId\'>;',
+  },
+  {
+    name: 'LeaseScope',
+    declaration: 'export type LeaseScope = \'subprocess\' | \'fs-write\' | \'web-fetch\' | \'dynamic-plugin\' | \'admin\';',
   },
   {
     name: 'LlmAdapter',
@@ -4529,6 +4712,10 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'PreToolDecision',
     declaration: 'export type PreToolDecision = {\n    kind: \'allow\';\n} | {\n    kind: \'deny\';\n    reason: string;\n} | {\n    kind: \'ask\';\n    reason?: string;\n};',
+  },
+  {
+    name: 'Principal',
+    declaration: 'export interface Principal {\n    readonly userId: UserId;\n    readonly displayName: string;\n    readonly roles: readonly string[];\n}',
   },
   {
     name: 'ProjectionChangeListener',
@@ -5771,6 +5958,34 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface ToolSchema {\n    name: string;\n    description: string;\n    parameters: Record<string, unknown>;\n}',
   },
   {
+    name: 'TrustAction',
+    declaration: 'export type TrustAction = Branded<\'TrustAction\'>;',
+  },
+  {
+    name: 'TrustAuditFilter',
+    declaration: 'export interface TrustAuditFilter {\n    readonly since?: number;\n    readonly until?: number;\n    readonly types?: readonly TrustAuditRecordType[];\n    readonly userId?: UserId;\n}',
+  },
+  {
+    name: 'TrustAuditRecord',
+    declaration: 'export interface TrustAuditRecord {\n    readonly type: TrustAuditRecordType;\n    readonly time: number;\n    readonly userId?: UserId;\n    readonly action?: string;\n    readonly resource?: string;\n    readonly reason?: string;\n    readonly outcome?: string;\n    readonly metadata?: Readonly<Record<string, string>>;\n}',
+  },
+  {
+    name: 'TrustAuditRecordType',
+    declaration: 'export type TrustAuditRecordType = \'auth/login\' | \'auth/logout\' | \'authz/denied\' | \'approval/decided\' | \'admin/policy-changed\' | \'credential/accessed\' | \'export/session\';',
+  },
+  {
+    name: 'TrustAuditSink',
+    declaration: 'export type TrustAuditSink = \'file\' | \'otel\' | \'jsonl\';',
+  },
+  {
+    name: 'TrustLogLink',
+    declaration: 'export interface TrustLogLink {\n    readonly seq: number;\n    readonly digest: string;\n    readonly payloadDigest: string;\n}',
+  },
+  {
+    name: 'TrustResource',
+    declaration: 'export type TrustResource = Branded<\'TrustResource\'>;',
+  },
+  {
     name: 'TurnEndCancelCause',
     declaration: 'export type TurnEndCancelCause = AgentCancelCause | {\n    readonly kind: \'legacy\';\n};',
   },
@@ -5883,8 +6098,16 @@ export const TYPE_API: readonly TypeApiEntry[] = [
     declaration: 'export interface UpdateTeamTaskRequest {\n    readonly taskId: TeamTaskId;\n    readonly expectedRevision: number;\n    readonly action: TeamTaskAction;\n    readonly subject?: string;\n    readonly description?: string;\n    readonly blockedBy?: readonly TeamTaskId[];\n    readonly writeScopes?: readonly string[];\n    readonly owner?: string;\n}',
   },
   {
+    name: 'UserId',
+    declaration: 'export type UserId = Branded<\'UserId\'>;',
+  },
+  {
     name: 'UserMessage',
     declaration: 'export interface UserMessage extends Message {\n    readonly role: \'user\';\n}',
+  },
+  {
+    name: 'VerifiedSessionExport',
+    declaration: 'export interface VerifiedSessionExport {\n    readonly sessionId: SessionId;\n    readonly links: readonly TrustLogLink[];\n}',
   },
   {
     name: 'VerifiedWebhookDelivery',

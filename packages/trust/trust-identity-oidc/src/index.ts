@@ -33,8 +33,11 @@ export interface StaticPrincipalBinding {
   readonly token: string
   /** Principal returned when the token matches. */
   readonly principal: {
+    /** Stable user identifier recorded in audit rows. */
     readonly userId: string
+    /** Human-readable name shown in operator surfaces. */
     readonly displayName: string
+    /** Roles the RBAC provider evaluates for this principal. */
     readonly roles: readonly string[]
   }
 }

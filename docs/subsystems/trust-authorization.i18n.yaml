@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write docs/subsystems/trust-authorization.md
-trust-authorization.md: 49bf17c0d61a3254aa34cfde98372caa12318923
-trust-authorization.zh.md: b08bd1547b33095800a88253235e6ff9dfccddd0
+trust-authorization.md: f662cfa3a96c1611f6120d2e31152e0ea494aaec
+trust-authorization.zh.md: 0c3875705eca9dbdc2efa261b573455c3e2d2a42

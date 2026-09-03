@@ -139,6 +139,10 @@ export const PROFILE_TEMPLATES: Record<string, ProfileTemplate> = {
     bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-web-app', '@deepseek-ai/dsh-enterprise'],
     patchReload: 'live',
   },
+  'trust-audit': {
+    bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-trust-audit-cli'],
+    patchReload: 'startup',
+  },
   acp: {
     bundles: ['@deepseek-ai/dsh-base', '@deepseek-ai/dsh-acp-app'],
     patchReload: 'startup',

@@ -134,6 +134,7 @@
       "@deepseek-ai/dsh-host-*/invariant": ["./packages/host/*/src/invariant.ts"],
       "@deepseek-ai/dsh-client-*/invariant": ["./packages/client/*/src/invariant.ts"],
       "@deepseek-ai/dsh-headless/startup": ["./packages/bundle/headless/src/startup.ts"],
+      "@deepseek-ai/dsh-trust-audit-cli/startup": ["./packages/bundle/trust-audit-cli/src/startup.ts"],
       "@deepseek-ai/dsh-web-app/startup": ["./packages/bundle/web-app/src/startup.ts"],
       "@deepseek-ai/dsh-client-*/client": ["./packages/client/*/src/client"],
       // One wildcard maps every @deepseek-ai/dsh-<name> to its source. Package
@@ -551,6 +552,8 @@
       "@deepseek-ai/dsh-trust-approval-grants/invariant": ["./packages/trust/trust-approval-grants/src/invariant.ts"],
       "@deepseek-ai/dsh-trust-audit": ["./packages/trust/trust-audit/src"],
       "@deepseek-ai/dsh-trust-audit/invariant": ["./packages/trust/trust-audit/src/invariant.ts"],
+      "@deepseek-ai/dsh-trust-audit-cli": ["./packages/bundle/trust-audit-cli/src"],
+      "@deepseek-ai/dsh-trust-audit-cli/invariant": ["./packages/bundle/trust-audit-cli/src/invariant.ts"],
       "@deepseek-ai/dsh-trust-audit-file": ["./packages/trust/trust-audit-file/src"],
       "@deepseek-ai/dsh-trust-audit-file/invariant": ["./packages/trust/trust-audit-file/src/invariant.ts"],
       "@deepseek-ai/dsh-trust-audit-otel": ["./packages/trust/trust-audit-otel/src"],

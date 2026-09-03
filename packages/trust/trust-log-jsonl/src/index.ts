@@ -36,7 +36,7 @@ interface ChainRecord {
  * Wraps `sessionPersistence.load` to refuse tampered chains fail-closed.
  */
 export class JsonlTrustLogProvider extends TrustLogProvider {
-  static inject = ['sessions'] as const
+  static inject = ['sessions']
 
   static Config: z<Config> = z.object({
     root: z.string().required(),
@@ -51,7 +51,10 @@ export class JsonlTrustLogProvider extends TrustLogProvider {
       })
     }, { global: true })
     ctx.inject(['sessionPersistence'], (scoped) => {
-      wrapPersistenceLoad(scoped.sessionPersistence, (id, events) => this.verifyEvents(id, events))
+      scoped.effect(() => wrapPersistenceLoad(
+        scoped.sessionPersistence,
+        (id, events) => this.verifyEvents(id, events),
+      ), 'trust-log-jsonl load verification')
     })
   }
 
@@ -143,23 +146,28 @@ export class JsonlTrustLogProvider extends TrustLogProvider {
  * Wrap persistence load so tampered chains refuse before the inspection returns.
  * @param persistence - active session persistence service.
  * @param verify - fail-closed verifier for the loaded event sequence.
+ * @returns a disposer restoring the provider's own `load`.
  */
 function wrapPersistenceLoad(
   persistence: SessionPersistence,
   verify: (id: SessionId, events: readonly SessionEvent[]) => Promise<void>,
-): void {
-  const tagged = persistence as SessionPersistence & { [LOAD_WRAPPED]?: true }
-  if (tagged[LOAD_WRAPPED] === true) return
-  tagged[LOAD_WRAPPED] = true
+): () => void {
+  if (WRAPPED.has(persistence)) return () => {}
+  WRAPPED.add(persistence)
   const original = persistence.load.bind(persistence)
   persistence.load = async (id: SessionId): Promise<SessionInspection> => {
     const inspection = await original(id)
     await verify(id, inspection.events)
     return inspection
   }
+  return () => {
+    persistence.load = original
+    WRAPPED.delete(persistence)
+  }
 }
 
-const LOAD_WRAPPED = Symbol.for('@deepseek-ai/dsh-trust-log-jsonl.loadWrapped')
+/** Persistence services whose `load` this package already wraps; a second mount must not double-verify. */
+const WRAPPED = new WeakSet<SessionPersistence>()
 
 function chainPath(root: string, sessionId: SessionId): string {
   return join(root, `${sessionId}.chain.jsonl`)

@@ -57,5 +57,9 @@
 | [conversation.md](conversation.zh.md) | target-neutral Session event 组装：Context identity、Location data、replay 路径、view builder 与 target 自有 render node |
 | [session-projection.md](session-projection.zh.md) | 投影 seam：`SessionProjectionMap`、纯函数 `ProjectionDefinition` 单元、`ProjectionSnapshot` 的一致切面、变更馈送 |
 | [session-telemetry.md](session-telemetry.zh.md) | 对外会话上报能力 seam：`SessionTelemetryRecord`/`SessionTelemetrySeverity`、`SessionTelemetrySink` 约定和 `session-telemetry/record` 脱敏 waterfall |
+| [trust-identity.md](trust-identity.zh.md) | 已认证主体 seam：`Principal`、`AuthRequest`/`AuthSession`、会话到用户的绑定，以及 Host ingress 约定 |
+| [trust-authorization.md](trust-authorization.zh.md) | RBAC 决策（`TrustAction`、`TrustResource`、`AuthorizationDecision`）、工具守卫、能力租约与组合准入 |
+| [trust-audit.md](trust-audit.zh.md) | 企业审计 seam：`TrustAuditRecord` 词汇表、`TrustAuditFilter` 与 `TrustAuditSink` 导出格式 |
+| [trust-log.md](trust-log.zh.md) | 持久会话日志上的哈希链完整性元数据与 `VerifiedSessionExport` 校验 |
 
 > 这些页面上的类型声明及其 JSDoc 与源码等价，并由 `pnpm run verify-type-equiv` 检查漂移（见 [development.md](../development.zh.md#documenting-types-verbatim-ts-type-equiv)）。普通块保留完整声明；`public-api` 块保留去除实现体的公开 class 声明。Cordis 服务与事件使用每页生成的 **Cordis API** 小节。

@@ -12,8 +12,11 @@ import type {} from '@deepseek-ai/dsh-user-approval'
 
 /** One stored approval grant scoped to admin policy. */
 export interface ApprovalGrant {
+  /** Tool the grant pre-approves. */
   readonly toolName: string
+  /** Principal the grant applies to. */
   readonly principalId: string
+  /** Epoch milliseconds after which the grant stops applying. */
   readonly expiresAt: number
 }
 
@@ -24,7 +27,7 @@ export interface Config {
 }
 
 export const name = 'trust-approval-grants'
-export const inject = ['trustAuthorization', 'trustIdentity'] as const
+export const inject = ['trustAuthorization', 'trustIdentity']
 
 export const Config = z.object({
   grants: z.array(z.object({

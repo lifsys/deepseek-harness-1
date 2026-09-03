@@ -25,7 +25,7 @@ describe('trust log jsonl', () => {
       await ctx.trustLog.extendChain(session.id, [...session.events])
       const chainPath = join(root, `${session.id}.chain.jsonl`)
       const text = await readFile(chainPath, 'utf8')
-      await writeFile(chainPath, text.replace(/[0-9a-f]{64}/, `${'0'.repeat(64)}`), 'utf8')
+      await writeFile(chainPath, text.replace(/[0-9a-f]{64}/, '0'.repeat(64)), 'utf8')
       await expect(ctx.trustLog.verifySession(session.id)).rejects.toBeInstanceOf(TrustLogTamperedError)
     } finally {
       await rm(root, { recursive: true, force: true })

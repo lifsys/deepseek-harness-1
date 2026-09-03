@@ -38,6 +38,14 @@ reconcile profile bundles 后运行 `dsh --profile enterprise web`。补丁在 `
 
 已认证 Host RPC ingress、审批前的 RBAC 拒绝、哈希链会话校验、仅追加审计导出，以及签名 bundle 准入检查。每个插入行由其包拥有强制语义；见 [packages/trust/](../../trust/README.zh.md)。
 
+### 密钥
+
+企业密钥从 Vault 解析：该补丁挂载 `@deepseek-ai/dsh-credentials-vault` 并禁用 base 的 `credentials` 行，因此不会有密钥来自 `$DSH_HOME/.credentials.yaml` 或项目 `.env`。启动前设置 `DSH_VAULT_ADDR` 与 `DSH_VAULT_MOUNT`——地址或 mount 未设置会拒绝加载，而不是回退到磁盘密钥——并把 Vault token 放入 `DSH_VAULT_TOKEN_REF` 指定的环境变量（默认 `VAULT_TOKEN`）。Vault provider 是只读的，因此 Web Models 页面的凭据写入会被拒绝。
+
+### 准入
+
+`trust-admission-boot` 默认关闭，因为准入摘要因站点而异。把本安装组合的 bundle manifest 记录到 `trust-admission` 与 `trust-admission-boot`，然后启用该行。
+
 -----
 
 <a id="understand-the-implementation"></a>

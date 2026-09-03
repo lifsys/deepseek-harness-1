@@ -597,7 +597,7 @@ export class TypertGatewayService extends Service implements TypertGateway {
 
   private async invokeRpc(endpoint: string, payload: unknown, signal: AbortSignal): Promise<ConnectionRpcResult> {
     try {
-      const identity = this.ctx.get('trustIdentity') as TrustIdentityProvider | undefined
+      const identity = this.ctx.get('trustIdentity')
       if (identity === undefined) {
         const value = await this.invoke(remoteRequest(endpoint, payload, signal))
         return { ok: true, value }

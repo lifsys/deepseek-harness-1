@@ -55,6 +55,12 @@ export { REGION_BEGIN, REGION_END }
  */
 export const SERVICE_PAGE: Record<string, string> = {
   agentLoop: 'core.md',
+  trustIdentity: 'trust-identity.md',
+  trustAuthorization: 'trust-authorization.md',
+  trustAdmission: 'trust-authorization.md',
+  trustLease: 'trust-authorization.md',
+  trustAudit: 'trust-audit.md',
+  trustLog: 'trust-log.md',
   agentDefaultModel: 'core.md',
   agentPresets: 'core.md',
   agents: 'core.md',
@@ -623,6 +629,20 @@ export const LINK_MAP: Readonly<Record<string, string>> = {
   TypertPackageRecord: 'invariants.md',
   TypertSchemaFilter: 'invariants.md',
   TypertSchemaRecord: 'invariants.md',
+  Principal: 'trust-identity.md',
+  AuthRequest: 'trust-identity.md',
+  AuthSession: 'trust-identity.md',
+  AuthorizationDecision: 'trust-authorization.md',
+  TrustAction: 'trust-authorization.md',
+  TrustResource: 'trust-authorization.md',
+  AdmissionManifest: 'trust-authorization.md',
+  CapabilityLease: 'trust-authorization.md',
+  LeaseId: 'trust-authorization.md',
+  LeaseScope: 'trust-authorization.md',
+  TrustAuditFilter: 'trust-audit.md',
+  TrustAuditRecord: 'trust-audit.md',
+  TrustAuditSink: 'trust-audit.md',
+  VerifiedSessionExport: 'trust-log.md',
 }
 
 /** TypeScript lib and pinned framework types with no repository-owned data page. */

@@ -3,6 +3,7 @@
  * @module @deepseek-ai/dsh-trust-audit-otel
  */
 
+import type {} from '@deepseek-ai/dsh-session-telemetry'
 import {
   TrustAuditProvider,
   type TrustAuditFilter,
@@ -10,19 +11,21 @@ import {
   type TrustAuditSink,
 } from '@deepseek-ai/dsh-trust-audit'
 
-const buffered: TrustAuditRecord[] = []
-
 /**
  * Audit provider that mirrors records into the session telemetry pipeline.
+ * Telemetry delivery is the durable path; the retained records answer
+ * `export` for the lifetime of this provider only.
  */
 export class OtelTrustAuditProvider extends TrustAuditProvider {
-  static inject = ['sessionTelemetry'] as const
+  static inject = ['sessionTelemetry']
+
+  private readonly emitted: TrustAuditRecord[] = []
+  private readonly listeners = new Set<(record: TrustAuditRecord) => void>()
 
   /** @inheritdoc */
-  async record(record: TrustAuditRecord): Promise<void> {
-    buffered.push(record)
-    const telemetry = this.ctx.get('sessionTelemetry')
-    telemetry?.emit({
+  record(record: TrustAuditRecord): Promise<void> {
+    this.emitted.push(record)
+    this.ctx.get('sessionTelemetry')?.emit({
       channel: 'ops',
       time: record.time,
       severity: record.type === 'authz/denied' ? 'warn' : 'info',
@@ -32,19 +35,21 @@ export class OtelTrustAuditProvider extends TrustAuditProvider {
       },
       body: record,
     })
+    for (const listener of this.listeners) listener(record)
+    return Promise.resolve()
   }
 
   /** @inheritdoc */
-  async export(sink: TrustAuditSink, filter?: TrustAuditFilter): Promise<string> {
+  export(sink: TrustAuditSink, filter?: TrustAuditFilter): Promise<string> {
     if (sink !== 'otel') throw new Error('trust-audit-otel: export supports otel sink only')
-    const filtered = buffered.filter(record => matchesFilter(record, filter))
-    return `${filtered.map(record => JSON.stringify(record)).join('\n')}\n`
+    const filtered = this.emitted.filter(record => matchesFilter(record, filter))
+    return Promise.resolve(`${filtered.map(record => JSON.stringify(record)).join('\n')}\n`)
   }
 
   /** @inheritdoc */
   subscribe(listener: (record: TrustAuditRecord) => void): () => void {
-    const wrapper = (record: TrustAuditRecord) => { listener(record) }
-    return () => { void wrapper }
+    this.listeners.add(listener)
+    return () => { this.listeners.delete(listener) }
   }
 }
 

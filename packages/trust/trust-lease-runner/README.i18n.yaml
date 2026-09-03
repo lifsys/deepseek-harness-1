@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/trust/trust-lease-runner/README.md
-README.md: 3c4fbe98c98bbd3513839d7fb3cadfc70e0634e3
-README.zh.md: e12412d8754371bb48fa2bb694326368a26245b5
+README.md: 47bd3387426c3cb7ce04e09291a0d1591c05dc4e
+README.zh.md: 57954fd221b4f349fed6df882934844f63c68a1e

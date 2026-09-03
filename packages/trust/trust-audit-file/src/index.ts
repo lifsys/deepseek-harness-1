@@ -21,8 +21,6 @@ export interface Config {
   readonly path?: string
 }
 
-const listeners = new Set<(record: TrustAuditRecord) => void>()
-
 /**
  * File-backed audit provider for air-gapped on-prem installs.
  */
@@ -31,6 +29,7 @@ export class FileTrustAuditProvider extends TrustAuditProvider {
     path: z.string(),
   })
 
+  private readonly listeners = new Set<(record: TrustAuditRecord) => void>()
   private readonly filePath: string
 
   constructor(ctx: Context, public config: Config) {
@@ -43,7 +42,7 @@ export class FileTrustAuditProvider extends TrustAuditProvider {
   async record(record: TrustAuditRecord): Promise<void> {
     await mkdir(join(this.filePath, '..'), { recursive: true })
     await writeFile(this.filePath, `${JSON.stringify(record)}\n`, { flag: 'a' })
-    for (const listener of listeners) listener(record)
+    for (const listener of this.listeners) listener(record)
   }
 
   /** @inheritdoc */
@@ -64,8 +63,8 @@ export class FileTrustAuditProvider extends TrustAuditProvider {
 
   /** @inheritdoc */
   subscribe(listener: (record: TrustAuditRecord) => void): () => void {
-    listeners.add(listener)
-    return () => { listeners.delete(listener) }
+    this.listeners.add(listener)
+    return () => { this.listeners.delete(listener) }
   }
 }
 

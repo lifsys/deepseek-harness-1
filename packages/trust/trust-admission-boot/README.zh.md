@@ -35,7 +35,13 @@ Validate composition at app-boot load。当 Host 面需要app-boot admission hoo
 
 ```yaml
 - name: '@deepseek-ai/dsh-trust-admission-boot'
+  config:
+    expected:
+      - id: dsh-enterprise
+        digest: <sha256 of the admitted bundle manifest>
 ```
+
+`expected` 列出本安装组合的 bundle 行。以空列表挂载该行会拒绝加载，因为不期望任何内容的准入检查等于准入一切组合。
 
 当提供方暴露 config 时，生成的[配置目录](../../../docs/config-catalog.zh.md)列出全部字段。
 

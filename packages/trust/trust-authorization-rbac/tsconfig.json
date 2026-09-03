@@ -8,6 +8,7 @@
     { "path": "../../runtime-diagnostics/invariants" },
     { "path": "../trust-authorization" },
     { "path": "../trust-identity" },
+    { "path": "../trust-audit" },
     { "path": "../../core/tools" },
     { "path": "../../../vendor/schemastery" }
   ]

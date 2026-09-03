@@ -35,7 +35,11 @@ Choose it when enterprise Host enforcement needs dynamic plugin fencing. Omit it
 
 ```yaml
 - name: '@deepseek-ai/dsh-trust-lease-runner'
+  config:
+    gatedTools: [dynamic_cordis_invoke]
 ```
+
+`gatedTools` names every tool that needs a live `dynamic-plugin` lease; an ungated tool passes the pipeline untouched. `budgetMs` sets the lease lifetime granted for one execution, and the lease is revoked once the execution settles.
 
 The generated [configuration catalog](../../../docs/config-catalog.md) lists every accepted field when the provider exposes config.
 

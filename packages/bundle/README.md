@@ -28,6 +28,8 @@ This group maps the installable patch layers used by `dsh --profile`. Each packa
 | [`headless`](headless/README.md) | One-shot command-line task application over base | `headless-runner` |
 | [`sdk-app`](sdk-app/README.md) | SDK JSON-RPC stdio application over base | mounts the SDK server |
 | [`sdk-minimal`](sdk-minimal/README.md) | Standalone minimal SDK application without base or Web | — (complete patch tree) |
+| [`enterprise`](enterprise/README.md) | Trust-core layer over base for on-prem enterprise profiles | mounts trust rows |
+| [`trust-audit-cli`](trust-audit-cli/README.md) | One-shot audit-export application over base | `trust-audit-export` |
 
 In-box bundles resolve from the dsh installation; out-of-tree bundles install into a profile through `dsh plugin --profile <name> add <package>`.
 

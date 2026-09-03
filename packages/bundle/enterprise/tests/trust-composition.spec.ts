@@ -19,6 +19,8 @@ import { TrustLogTamperedError } from '@deepseek-ai/dsh-trust-log'
 import SessionStore from '@deepseek-ai/dsh-session'
 import TypertRegistry from '@deepseek-ai/dsh-typert-registry'
 import TypertGatewayService from '@deepseek-ai/dsh-api-gateway'
+import * as TrustGateway from '@deepseek-ai/dsh-trust-gateway'
+import { withRpcRequest } from '@deepseek-ai/dsh-client-connection'
 import {
   bindTypertRemote,
   Remote,
@@ -100,6 +102,90 @@ function agent(ctx: Context): Agent {
 function resultText(result: { content: { type: string; text?: string }[] }): string {
   return result.content.filter(block => block.type === 'text').map(block => block.text).join('')
 }
+
+/**
+ * Boot the enterprise Host RPC rows through the Loader over a fake connection.
+ * @param root - temporary directory owning the generated `cordis.yml`.
+ * @returns the mounted context and its intercepted RPC handler.
+ */
+async function bootHostRpc(root: string): Promise<{ ctx: Context; handler: FakeRpcHandler }> {
+  const configPath = join(root, 'cordis.yml')
+  await writeFile(configPath, [
+    "- name: '@deepseek-ai/dsh-trust-identity-oidc'",
+    '  config:',
+    '    staticBindings:',
+    '      - token: enterprise-admin-token',
+    '        principal:',
+    '          userId: admin-1',
+    '          displayName: Enterprise Admin',
+    '          roles: [admin]',
+    "- name: '@deepseek-ai/dsh-trust-gateway'",
+    "- name: '@deepseek-ai/dsh-typert-registry'",
+    "- name: '@deepseek-ai/dsh-api-gateway'",
+    "- name: '@deepseek-ai/dsh-probe'",
+    '',
+  ].join('\n'))
+
+  const ctx = new Context()
+  context = ctx
+  await ctx.plugin(FakeConnectionService)
+  ctx.baseUrl = pathToFileURL(root).href + '/'
+  await ctx.plugin(Loader)
+  ctx.loader.builtins.include = Include
+  const modules = new Map<string, unknown>([
+    ['@deepseek-ai/dsh-trust-identity-oidc', OidcTrustIdentityProvider],
+    ['@deepseek-ai/dsh-trust-gateway', TrustGateway],
+    ['@deepseek-ai/dsh-typert-registry', TypertRegistry],
+    ['@deepseek-ai/dsh-api-gateway', TypertGatewayService],
+    ['@deepseek-ai/dsh-probe', ProbeService],
+  ])
+  ctx.loader.internal = {
+    version: 'v2',
+    async import(specifier: string) {
+      if (!modules.has(specifier)) throw new Error(`unexpected Loader import: ${specifier}`)
+      return modules.get(specifier)
+    },
+  } as unknown as NonNullable<typeof ctx.loader.internal>
+  await ctx.loader.create({ name: 'cordis:include', config: { path: pathToFileURL(configPath).href } })
+  await ctx.loader.await()
+  const handler = (ctx.get('connection') as unknown as FakeConnectionService).handler
+  if (handler === undefined) throw new Error('enterprise composition: no RPC handler intercepted')
+  return { ctx, handler }
+}
+
+/** Dispatch one RPC under a Fetch request carrying `authorization`, when given. */
+function callRpc(handler: FakeRpcHandler, authorization?: string): Promise<FakeRpcResult> {
+  const request = new Request('http://host.invalid/api', {
+    headers: authorization === undefined ? {} : { authorization },
+  })
+  return withRpcRequest(request, () => handler('probe/ping', { args: {} }, new AbortController().signal))
+}
+
+describe('enterprise Host RPC ingress through the Loader', () => {
+  it('refuses an RPC that carries no Authorization header', async () => {
+    root = await mkdtemp(join(tmpdir(), 'dsh-enterprise-rpc-'))
+    const { handler } = await bootHostRpc(root)
+    expect(await callRpc(handler)).toEqual({
+      ok: false,
+      error: { code: 'unauthorized', message: 'authentication required', details: {} },
+    })
+  })
+
+  it('refuses a Bearer credential the identity provider does not know', async () => {
+    root = await mkdtemp(join(tmpdir(), 'dsh-enterprise-rpc-'))
+    const { handler } = await bootHostRpc(root)
+    expect(await callRpc(handler, 'Bearer not-a-real-token')).toEqual({
+      ok: false,
+      error: { code: 'unauthorized', message: 'invalid credential', details: {} },
+    })
+  })
+
+  it('binds the principal from a valid Bearer credential and answers the call', async () => {
+    root = await mkdtemp(join(tmpdir(), 'dsh-enterprise-rpc-'))
+    const { handler } = await bootHostRpc(root)
+    expect(await callRpc(handler, 'Bearer enterprise-admin-token')).toEqual({ ok: true, value: 'pong' })
+  })
+})
 
 describe('enterprise trust REAL composition', () => {
   it('unauthenticated Host RPC returns unauthorized', async () => {
@@ -242,7 +328,7 @@ describe('enterprise trust REAL composition', () => {
     await context.trustLog.extendChain(session.id, [...session.events])
     const chainPath = join(chainRoot, `${session.id}.chain.jsonl`)
     const text = await readFile(chainPath, 'utf8')
-    await writeFile(chainPath, text.replace(/[0-9a-f]{64}/, `${'0'.repeat(64)}`), 'utf8')
+    await writeFile(chainPath, text.replace(/[0-9a-f]{64}/, '0'.repeat(64)), 'utf8')
     await expect(context.trustLog.verifySession(session.id)).rejects.toBeInstanceOf(TrustLogTamperedError)
     await expect(context.sessionPersistence.load(session.id)).rejects.toBeInstanceOf(TrustLogTamperedError)
   })

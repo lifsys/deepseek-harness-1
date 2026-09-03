@@ -6,7 +6,7 @@
 import type { Context } from '@deepseek-ai/cordis'
 
 export const name = 'trust-gateway'
-export const inject = ['trustIdentity'] as const
+export const inject = ['trustIdentity']
 
 /** Marker plugin ensuring trust identity mounts before Host RPC surfaces. */
 export function apply(_ctx: Context): void {}

@@ -35,7 +35,11 @@ Lease checks for cordis-host-runner dynamic plugins。当 Host 面需要dynamic 
 
 ```yaml
 - name: '@deepseek-ai/dsh-trust-lease-runner'
+  config:
+    gatedTools: [dynamic_cordis_invoke]
 ```
+
+`gatedTools` 列出每个需要有效 `dynamic-plugin` 租约的工具；未被门控的工具原样通过流水线。`budgetMs` 设定单次执行获得的租约生命期，执行结束后租约被撤销。
 
 当提供方暴露 config 时，生成的[配置目录](../../../docs/config-catalog.zh.md)列出全部字段。
 

@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write docs/on-prem-enterprise-hardening.md
-on-prem-enterprise-hardening.md: d9da7a91d0eb24bb6c5412f62c9b63a7caa1d859
-on-prem-enterprise-hardening.zh.md: e14ab4d08433bd12876f4ef0d5cc272e97f7c3be
+on-prem-enterprise-hardening.md: 35e7e6fea7b9944760223258ccfcc6bc71e1b90e
+on-prem-enterprise-hardening.zh.md: 9484a81174d79e3275ab22c59d6475a3948c7aa1

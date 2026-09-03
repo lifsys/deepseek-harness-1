@@ -10,7 +10,7 @@ import type {} from '@deepseek-ai/dsh-trust-identity'
 import type {} from '@deepseek-ai/dsh-user-approval'
 
 export const name = 'trust-approval-audit'
-export const inject = ['trustAudit', 'trustIdentity'] as const
+export const inject = ['trustAudit', 'trustIdentity']
 
 /** Record approval decisions in the enterprise audit log. */
 export function apply(ctx: Context): void {

@@ -9,8 +9,11 @@ import z from '@deepseek-ai/schemastery'
 
 /** One signed bundle manifest row. */
 export interface AdmissionManifest {
+  /** Bundle package name the row admits. */
   readonly id: string
+  /** SHA-256 hex digest of the admitted bundle manifest. */
   readonly digest: string
+  /** Detached signature over the digest, when the installation signs manifests. */
   readonly signature?: string
 }
 
@@ -70,7 +73,7 @@ export class ConfigTrustAdmissionProvider extends TrustAdmissionProvider {
 
   /** @inheritdoc */
   validateComposition(manifests: readonly AdmissionManifest[]): void {
-    const allowed = new Map((this.config.manifests ?? []).map(entry => [entry.id, entry]))
+    const allowed = new Map(this.config.manifests.map(entry => [entry.id, entry]))
     for (const manifest of manifests) {
       const expected = allowed.get(manifest.id)
       if (expected === undefined) {

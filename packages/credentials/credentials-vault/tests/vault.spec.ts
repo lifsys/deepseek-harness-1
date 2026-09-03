@@ -6,7 +6,6 @@ import { TrustAuditProvider } from '@deepseek-ai/dsh-trust-audit'
 import VaultCredentialProvider, {
   VaultCredentialUnavailableError,
   resolveSpec,
-  type VaultFetch,
 } from '../src/index.ts'
 
 class MemoryAudit extends TrustAuditProvider {
@@ -54,7 +53,7 @@ describe('credentials-vault', () => {
       address: 'https://vault.example.com',
       mountPath: 'secret/data/dsh',
       tokenRef: 'VAULT_TOKEN',
-      fetch: (async () => new Response('{}')) as VaultFetch,
+      fetch: async () => new Response('{}'),
     })
     await expect(ctx.credentials.resolve(credentialRef('DEEPSEEK_API_KEY')))
       .rejects.toBeInstanceOf(VaultCredentialUnavailableError)
@@ -69,7 +68,7 @@ describe('credentials-vault', () => {
       address: 'https://vault.example.com/',
       mountPath: 'secret/data/dsh',
       tokenRef: 'VAULT_TOKEN',
-      fetch: (async (url, init) => {
+      fetch: async (url, init) => {
         calls.push({
           url,
           token: new Headers(init?.headers).get('X-Vault-Token'),
@@ -77,7 +76,7 @@ describe('credentials-vault', () => {
         return new Response(JSON.stringify({
           data: { data: { value: 'secret-value' } },
         }), { status: 200 })
-      }) as VaultFetch,
+      },
     })
     const resolved = await ctx.credentials.resolve(credentialRef('DEEPSEEK_API_KEY'))
     expect(resolved).toEqual({ value: 'secret-value', source: 'vault' })
@@ -101,7 +100,7 @@ describe('credentials-vault', () => {
       address: 'https://vault.example.com',
       mountPath: 'secret/data/dsh',
       tokenRef: 'VAULT_TOKEN',
-      fetch: (async () => new Response('nope', { status: 503 })) as VaultFetch,
+      fetch: async () => new Response('nope', { status: 503 }),
     })
     await expect(ctx.credentials.resolve(credentialRef('DEEPSEEK_API_KEY')))
       .rejects.toBeInstanceOf(VaultCredentialUnavailableError)

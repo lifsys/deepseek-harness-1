@@ -15,10 +15,15 @@ import {
   type TrustResource,
 } from '@deepseek-ai/dsh-trust-authorization'
 import type { PreToolDecision } from '@deepseek-ai/dsh-tools'
+// Empty type import: the audit seam's Context merge types the optional
+// `trustAudit` read below, which this package never injects.
+import type {} from '@deepseek-ai/dsh-trust-audit'
 
 /** One role→permission mapping entry. Permission strings accept `*` or `tool:<name>` patterns. */
 export interface RolePermissions {
+  /** Role name matched against a principal's roles. */
   readonly role: string
+  /** Permission patterns the role grants. */
   readonly permissions: readonly string[]
 }
 

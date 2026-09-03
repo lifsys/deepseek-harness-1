@@ -35,7 +35,13 @@ Choose it when enterprise Host enforcement needs app-boot admission hook. Omit i
 
 ```yaml
 - name: '@deepseek-ai/dsh-trust-admission-boot'
+  config:
+    expected:
+      - id: dsh-enterprise
+        digest: <sha256 of the admitted bundle manifest>
 ```
+
+`expected` names the bundle rows this installation composes. Mounting the row with an empty list refuses to load, because an admission check that expects nothing admits every composition.
 
 The generated [configuration catalog](../../../docs/config-catalog.md) lists every accepted field when the provider exposes config.
 

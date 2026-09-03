@@ -38,6 +38,14 @@ Run `dsh --profile enterprise web` after reconciling the profile bundles. The pa
 
 Authenticated Host RPC ingress, RBAC denial before approval, hash-chain session verification, append-only audit export, and signed bundle admission checks. Each inserted row's package owns its enforcement semantics; see [packages/trust/](../../trust/README.md).
 
+### Secrets
+
+Enterprise secrets resolve from Vault: the patch mounts `@deepseek-ai/dsh-credentials-vault` and disables the base `credentials` row, so no secret resolves from `$DSH_HOME/.credentials.yaml` or a project `.env`. Set `DSH_VAULT_ADDR` and `DSH_VAULT_MOUNT` before boot — an unset address or mount refuses to load rather than falling back to on-disk secrets — and put the Vault token in the environment variable `DSH_VAULT_TOKEN_REF` names (`VAULT_TOKEN` by default). The Vault provider is read-only, so credential writes from the Web Models page are rejected.
+
+### Admission
+
+`trust-admission-boot` ships disabled because admitted digests are site-specific. Record the bundle manifests this installation composes in both `trust-admission` and `trust-admission-boot`, then enable the row.
+
 -----
 
 <a id="understand-the-implementation"></a>

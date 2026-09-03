@@ -319,6 +319,7 @@
     { "path": "./packages/trust/trust-admission" },
     { "path": "./packages/trust/trust-admission-boot" },
     { "path": "./packages/bundle/enterprise" },
+    { "path": "./packages/bundle/trust-audit-cli" },
     { "path": "./packages/credentials/credentials-vault" },
     { "path": "./packages/todo/tool-todo" },
     { "path": "./packages/plan/plan-mode" },
