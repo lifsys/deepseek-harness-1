@@ -5,6 +5,7 @@ import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 export const name = 'trust-approval-audit-invariant'
 export const inject = ['invariants']
 
+// No runtime invariant: mirrors approval session events into trustAudit without owning a separate stream.
 const install: InvariantInstaller = () => {}
 
 export const apply = (ctx: Context): Promise<() => void> =>

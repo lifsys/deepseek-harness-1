@@ -5,6 +5,7 @@ import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 export const name = 'trust-lease-runner-invariant'
 export const inject = ['invariants']
 
+// No runtime invariant: lease checks are pre-execute denials covered by the tools pipeline.
 const install: InvariantInstaller = () => {}
 
 export const apply = (ctx: Context): Promise<() => void> =>

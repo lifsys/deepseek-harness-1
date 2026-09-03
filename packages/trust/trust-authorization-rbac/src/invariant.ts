@@ -5,6 +5,7 @@ import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 export const name = 'trust-authorization-rbac-invariant'
 export const inject = ['invariants']
 
+// No runtime invariant: pre-execute denials are tool-pipeline outcomes already checked by tools invariants.
 const install: InvariantInstaller = () => {}
 
 export const apply = (ctx: Context): Promise<() => void> =>

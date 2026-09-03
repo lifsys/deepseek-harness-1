@@ -17,6 +17,9 @@
               displayName: Enterprise Developer
               roles: [developer]
 
+    - id: trust-gateway
+      name: '@deepseek-ai/dsh-trust-gateway'
+
     - id: trust-authorization
       name: '@deepseek-ai/dsh-trust-authorization-rbac'
       config:

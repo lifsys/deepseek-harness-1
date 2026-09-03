@@ -5,6 +5,7 @@ import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 export const name = 'trust-gateway-invariant'
 export const inject = ['invariants']
 
+// No runtime invariant: marker consumer; Host RPC enforcement lives in api-gateway.
 const install: InvariantInstaller = () => {}
 
 export const apply = (ctx: Context): Promise<() => void> =>

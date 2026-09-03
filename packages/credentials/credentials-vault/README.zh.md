@@ -74,7 +74,9 @@ No direct invalidation; resolved values never enter a request prefix.
 
 <a id="known-limitations-and-deferred-work"></a>
 
-- **Phase 1 范围** — Live Vault integration is BLOCKED-FOR-REAL-WORLD; scaffold only.
+- **BLOCKED-FOR-REAL-WORLD — 真实 Vault** — CI 不覆盖生产 HashiCorp Vault（或 Azure Key Vault）连通性、AppRole/Kubernetes 认证与运维签发的 token。该 provider 会发起真实 HTTP KV v2 读取，并在 Vault 不可达或 `tokenRef` 未设置时 fail-closed；在企业补丁中启用 vault 行后，用 `VAULT_TOKEN=… dsh --profile enterprise …` 对真实 Vault 取证。
+- **写入路径** — 仍不支持 Vault reference/record 写入；请在 Vault 侧轮换密钥。
+- **本地凭证仍启用** — 在证明 Vault 可用之前，企业补丁仍保持 `credentials-local` 启用。
 
 <a id="dev-note"></a>
 ### 开发备注

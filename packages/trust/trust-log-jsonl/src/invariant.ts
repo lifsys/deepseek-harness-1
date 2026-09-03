@@ -5,6 +5,7 @@ import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 export const name = 'trust-log-jsonl-invariant'
 export const inject = ['invariants']
 
+// No runtime invariant: hash-chain correctness requires file round-trip tests rather than a live companion.
 const install: InvariantInstaller = () => {}
 
 export const apply = (ctx: Context): Promise<() => void> =>

@@ -23,6 +23,7 @@
   "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
   "dependencies": {
     "@deepseek-ai/dsh-trust-identity-oidc": "workspace:^",
+    "@deepseek-ai/dsh-trust-gateway": "workspace:^",
     "@deepseek-ai/dsh-trust-authorization-rbac": "workspace:^",
     "@deepseek-ai/dsh-trust-log-jsonl": "workspace:^",
     "@deepseek-ai/dsh-trust-audit-file": "workspace:^",
@@ -36,5 +37,24 @@
     "@deepseek-ai/dsh-credentials-vault": "workspace:^"
   },
   "peerDependencies": { "@deepseek-ai/cordis": "workspace:^", "@deepseek-ai/dsh-invariants": "workspace:^" },
-  "devDependencies": { "@deepseek-ai/cordis": "workspace:^", "@deepseek-ai/dsh-invariants": "workspace:^" }
+  "devDependencies": {
+    "@deepseek-ai/cordis": "workspace:^",
+    "@deepseek-ai/dsh-invariants": "workspace:^",
+    "@deepseek-ai/dsh-agent": "workspace:^",
+    "@deepseek-ai/dsh-api-gateway": "workspace:^",
+    "@deepseek-ai/dsh-system-prompt": "workspace:^",
+    "@deepseek-ai/dsh-tools": "workspace:^",
+    "@deepseek-ai/dsh-session": "workspace:^",
+    "@deepseek-ai/dsh-trust-identity": "workspace:^",
+    "@deepseek-ai/dsh-trust-identity-oidc": "workspace:^",
+    "@deepseek-ai/dsh-trust-authorization-rbac": "workspace:^",
+    "@deepseek-ai/dsh-trust-log": "workspace:^",
+    "@deepseek-ai/dsh-trust-log-jsonl": "workspace:^",
+    "@deepseek-ai/dsh-trust-audit": "workspace:^",
+    "@deepseek-ai/dsh-trust-audit-file": "workspace:^",
+    "@deepseek-ai/dsh-typert-registry": "workspace:^",
+    "@deepseek-ai/dsh-typert-protocol": "workspace:^",
+    "@deepseek-ai/cordis-plugin-loader": "workspace:^",
+    "@deepseek-ai/cordis-plugin-include": "workspace:^"
+  }
 }

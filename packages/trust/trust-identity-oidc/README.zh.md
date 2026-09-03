@@ -74,7 +74,8 @@ Independent of model request assembly.
 
 <a id="known-limitations-and-deferred-work"></a>
 
-- **Phase 1 范围** — Live OIDC discovery requires operator-supplied issuer metadata.
+- **BLOCKED-FOR-REAL-WORLD — 真实 IdP** — CI 不覆盖授权码登录、JWKS 签名校验、token 刷新，以及对 Okta/Entra/Keycloak 的 SAML。静态 token 模式与未签名 JWT claim 解析（issuer/audience/`sub`）供测试与气隙引导使用；在接入 JWKS 校验并对照真实 issuer 取证之前，不要把 claim 解析当作生产 IdP 校验。
+- **匿名预览** — 默认 `web`/`headless` profile 省略本 provider；Host RPC 仅保留浏览器会话 cookie。
 
 <a id="dev-note"></a>
 ### 开发备注

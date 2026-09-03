@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/trust/trust-identity-oidc/README.md
-README.md: 40764de19d8ed07cf89b36f67b4473a67c64e52e
-README.zh.md: af20ce53436687c37bf2ce3b0a5deeb754a4451d
+README.md: c3c7f26ac6825d0f0ab0dfeeadefd4792313a3b9
+README.zh.md: aeba096374af85e211b2132573c710efbf04c9c5

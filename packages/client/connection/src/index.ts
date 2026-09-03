@@ -40,6 +40,7 @@ export {
   serverResponseSchema,
 } from './rpc-schema.ts'
 export { HostConnectionService } from './rpc-host.ts'
+export { currentRpcRequest, withRpcRequest } from './rpc-request-scope.ts'
 
 export { API_PATH } from './api-path.ts'
 

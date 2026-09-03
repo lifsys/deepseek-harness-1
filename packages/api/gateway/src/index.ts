@@ -7,7 +7,11 @@
 
 import { randomUUID } from 'node:crypto'
 import { Context, Service, symbols } from '@deepseek-ai/cordis'
-import type { ConnectionRpcHandler } from '@deepseek-ai/dsh-client-connection'
+import { currentRpcRequest, type ConnectionRpcHandler } from '@deepseek-ai/dsh-client-connection'
+import {
+  TrustIdentityUnauthorizedError,
+  type TrustIdentityProvider,
+} from '@deepseek-ai/dsh-trust-identity'
 import type { WebUpgradeRoute } from '@deepseek-ai/dsh-host-webserver'
 import { MAX_TIMER_DELAY_MS } from '@deepseek-ai/dsh-timeout'
 import z from '@deepseek-ai/schemastery'
@@ -593,9 +597,12 @@ export class TypertGatewayService extends Service implements TypertGateway {
 
   private async invokeRpc(endpoint: string, payload: unknown, signal: AbortSignal): Promise<ConnectionRpcResult> {
     try {
-      const identity = this.ctx.get('trustIdentity')
-      identity?.requirePrincipal()
-      const value = await this.invoke(remoteRequest(endpoint, payload, signal))
+      const identity = this.ctx.get('trustIdentity') as TrustIdentityProvider | undefined
+      if (identity === undefined) {
+        const value = await this.invoke(remoteRequest(endpoint, payload, signal))
+        return { ok: true, value }
+      }
+      const value = await this.invokeWithPrincipal(identity, endpoint, payload, signal)
       // A void or explicitly absent business result carries no `value` field;
       // JSON has no `undefined`, and the envelope's optional slot is the one
       // representation of absence that both args and results already use.
@@ -603,6 +610,29 @@ export class TypertGatewayService extends Service implements TypertGateway {
     } catch (error) {
       return rpcFailure(error)
     }
+  }
+
+  /**
+   * Bind an authenticated principal for one Host RPC when enterprise identity is mounted.
+   * Prefer an already-bound principal (tests / nested calls); otherwise authenticate a
+   * Bearer credential from the active Fetch request. Missing or invalid credentials fail closed.
+   */
+  private async invokeWithPrincipal(
+    identity: TrustIdentityProvider,
+    endpoint: string,
+    payload: unknown,
+    signal: AbortSignal,
+  ): Promise<unknown> {
+    if (identity.currentPrincipal() !== undefined) {
+      identity.requirePrincipal()
+      return this.invoke(remoteRequest(endpoint, payload, signal))
+    }
+    const credential = bearerCredential(currentRpcRequest())
+    if (credential === undefined) throw new TrustIdentityUnauthorizedError()
+    const session = await identity.authenticate({ credential })
+    if (session === undefined) throw new TrustIdentityUnauthorizedError('invalid credential')
+    return identity.withPrincipal(session.principal, () =>
+      this.invoke(remoteRequest(endpoint, payload, signal)))
   }
 
   private async prepareInvocation(request: InvokeRemoteRequest): Promise<PreparedInvocation> {
@@ -1041,6 +1071,15 @@ function isUnauthorizedError(error: unknown): boolean {
   return error instanceof Error
     && (error.name === 'TrustIdentityUnauthorizedError'
       || (error as { code?: unknown }).code === 'unauthorized')
+}
+
+/** Extract a Bearer token from the active Fetch request Authorization header. */
+function bearerCredential(request: Request | undefined): string | undefined {
+  if (request === undefined) return undefined
+  const header = request.headers.get('authorization')
+  if (header === null) return undefined
+  const match = /^Bearer\s+(\S+)$/i.exec(header.trim())
+  return match?.[1]
 }
 
 function validateBinding(

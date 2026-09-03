@@ -17,7 +17,9 @@ export interface ApprovalGrant {
   readonly expiresAt: number
 }
 
+/** Plugin configuration for preloaded admin approval grants. */
 export interface Config {
+  /** Grants honored until `expiresAt` for the named principal and tool. */
   readonly grants: readonly ApprovalGrant[]
 }
 

@@ -35,6 +35,9 @@
       "path": "../../typert/protocol"
     },
     {
+      "path": "../../trust/trust-identity"
+    },
+    {
       "path": "../../util/timeout"
     }
   ]

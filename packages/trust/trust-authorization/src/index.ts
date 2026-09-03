@@ -39,13 +39,21 @@ export class TrustAuthorizationDeniedError extends Error {
   }
 }
 
-/** Brand a resource string for RBAC evaluation. */
+/**
+ * Brand a resource string for RBAC evaluation.
+ * @param value - non-empty resource identifier such as `tool:Read`.
+ * @returns branded trust resource.
+ */
 export function trustResource(value: string): TrustResource {
   if (value.length === 0) throw new TypeError('trust resource must be non-empty')
   return value as TrustResource
 }
 
-/** Brand an action string for RBAC evaluation. */
+/**
+ * Brand an action string for RBAC evaluation.
+ * @param value - non-empty action identifier such as `execute`.
+ * @returns branded trust action.
+ */
 export function trustAction(value: string): TrustAction {
   if (value.length === 0) throw new TypeError('trust action must be non-empty')
   return value as TrustAction

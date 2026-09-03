@@ -74,7 +74,8 @@ Independent of model request assembly.
 
 <a id="known-limitations-and-deferred-work"></a>
 
-- **Phase 1 scope** — Live OIDC discovery requires operator-supplied issuer metadata.
+- **BLOCKED-FOR-REAL-WORLD — live IdP** — Authorization-code login, JWKS signature verification, token refresh, and SAML against Okta/Entra/Keycloak are not exercised in CI. Static-token mode and unsigned JWT claim parsing (issuer/audience/`sub`) are available for tests and air-gapped bootstrap; do not treat claim parsing as production IdP verification until JWKS verification is wired and proven against a real issuer.
+- **Anonymous preview** — Default `web`/`headless` profiles omit this provider; Host RPC stays on browser-session cookies only.
 
 <a id="dev-note"></a>
 ### Dev Note

@@ -88,4 +88,4 @@ export class MemoryTrustLeaseProvider extends TrustLeaseProvider {
   }
 }
 
-export default TrustLeaseProvider
+export default MemoryTrustLeaseProvider

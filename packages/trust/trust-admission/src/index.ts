@@ -16,6 +16,7 @@ export interface AdmissionManifest {
 
 /** Fail-closed admission error. */
 export class TrustAdmissionRejectedError extends Error {
+  /** Stable machine-readable failure category. */
   readonly code = 'admission-rejected' as const
 
   /** @param reason - auditable rejection reason without secret material. */
@@ -85,9 +86,13 @@ export class ConfigTrustAdmissionProvider extends TrustAdmissionProvider {
   }
 }
 
-/** Compute a stable digest for one manifest payload. */
+/**
+ * Compute a stable digest for one manifest payload.
+ * @param payload - canonical manifest bytes as UTF-8 text.
+ * @returns hex SHA-256 digest.
+ */
 export function digestManifest(payload: string): string {
   return createHash('sha256').update(payload).digest('hex')
 }
 
-export default TrustAdmissionProvider
+export default ConfigTrustAdmissionProvider

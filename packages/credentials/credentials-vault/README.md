@@ -74,7 +74,9 @@ No direct invalidation; resolved values never enter a request prefix.
 
 <a id="known-limitations-and-deferred-work"></a>
 
-- **Phase 1 scope** — Live Vault integration is BLOCKED-FOR-REAL-WORLD; scaffold only.
+- **BLOCKED-FOR-REAL-WORLD — live Vault** — Production HashiCorp Vault (or Azure Key Vault) connectivity, AppRole/Kubernetes auth, and operator-issued tokens are not exercised in CI. The provider performs real HTTP KV v2 reads and fails closed when Vault is unreachable or `tokenRef` is unset; prove against a real Vault with: `VAULT_TOKEN=… dsh --profile enterprise …` after enabling the vault row in the enterprise patch.
+- **Write path** — Vault reference and record writes remain unsupported; rotate secrets in Vault itself.
+- **Local credentials remain enabled** — The enterprise patch leaves `credentials-local` enabled until an operator disables it after Vault is proven.
 
 <a id="dev-note"></a>
 ### Dev Note

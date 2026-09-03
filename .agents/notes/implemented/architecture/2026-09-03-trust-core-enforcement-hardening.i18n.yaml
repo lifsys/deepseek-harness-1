@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/architecture/2026-09-03-trust-core-enforcement-hardening.md
+2026-09-03-trust-core-enforcement-hardening.md: a994fa1b89f0ff0b8ce6ce29e479c01d55c19b7c
+2026-09-03-trust-core-enforcement-hardening.zh.md: 8a77b81da32f7e7efce6691364039311f01b02be

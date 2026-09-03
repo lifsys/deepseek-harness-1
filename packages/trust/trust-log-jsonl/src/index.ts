@@ -10,6 +10,7 @@ import { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
 import { snapshotSessionEvent } from '@deepseek-ai/dsh-session'
 import type { SessionEvent, SessionId } from '@deepseek-ai/dsh-session'
+import type { SessionInspection, SessionPersistence } from '@deepseek-ai/dsh-session-persistence'
 import {
   TrustLogProvider,
   TrustLogTamperedError,
@@ -32,6 +33,7 @@ interface ChainRecord {
 
 /**
  * Hash-chain {@link TrustLogProvider} with JSONL sidecar files.
+ * Wraps `sessionPersistence.load` to refuse tampered chains fail-closed.
  */
 export class JsonlTrustLogProvider extends TrustLogProvider {
   static inject = ['sessions'] as const
@@ -48,15 +50,32 @@ export class JsonlTrustLogProvider extends TrustLogProvider {
         ctx.logger.warn(error)
       })
     }, { global: true })
+    ctx.inject(['sessionPersistence'], (scoped) => {
+      wrapPersistenceLoad(scoped.sessionPersistence, (id, events) => this.verifyEvents(id, events))
+    })
   }
 
   /** @inheritdoc */
   async verifySession(sessionId: SessionId): Promise<void> {
     const session = this.ctx.sessions.get(sessionId)
     if (session === undefined) throw new TrustLogTamperedError(sessionId, `session ${sessionId} is not loaded`)
+    await this.verifyEvents(sessionId, session.events)
+  }
+
+  /**
+   * Verify one event sequence against the persisted hash chain.
+   * @param sessionId - session identity for the sidecar path.
+   * @param events - canonical event sequence to check.
+   * @throws {@link TrustLogTamperedError} when digests do not match.
+   */
+  async verifyEvents(sessionId: SessionId, events: readonly SessionEvent[]): Promise<void> {
     const links = await this.readChain(sessionId)
+    if (links.length === 0 && events.length === 0) return
+    if (links.length === 0 && events.length > 0) {
+      throw new TrustLogTamperedError(sessionId, `missing trust chain for session ${sessionId}`)
+    }
     let prev = ''
-    for (const [index, event] of session.events.entries()) {
+    for (const [index, event] of events.entries()) {
       const seq = index + 1
       const link = links.find(entry => entry.seq === seq)
       const payloadDigest = digestPayload(event)
@@ -66,7 +85,7 @@ export class JsonlTrustLogProvider extends TrustLogProvider {
       }
       prev = expected
     }
-    if (links.length > session.events.length) {
+    if (links.length > events.length) {
       throw new TrustLogTamperedError(sessionId, `trust chain has extra links for session ${sessionId}`)
     }
   }
@@ -119,6 +138,28 @@ export class JsonlTrustLogProvider extends TrustLogProvider {
     return links
   }
 }
+
+/**
+ * Wrap persistence load so tampered chains refuse before the inspection returns.
+ * @param persistence - active session persistence service.
+ * @param verify - fail-closed verifier for the loaded event sequence.
+ */
+function wrapPersistenceLoad(
+  persistence: SessionPersistence,
+  verify: (id: SessionId, events: readonly SessionEvent[]) => Promise<void>,
+): void {
+  const tagged = persistence as SessionPersistence & { [LOAD_WRAPPED]?: true }
+  if (tagged[LOAD_WRAPPED] === true) return
+  tagged[LOAD_WRAPPED] = true
+  const original = persistence.load.bind(persistence)
+  persistence.load = async (id: SessionId): Promise<SessionInspection> => {
+    const inspection = await original(id)
+    await verify(id, inspection.events)
+    return inspection
+  }
+}
+
+const LOAD_WRAPPED = Symbol.for('@deepseek-ai/dsh-trust-log-jsonl.loadWrapped')
 
 function chainPath(root: string, sessionId: SessionId): string {
   return join(root, `${sessionId}.chain.jsonl`)

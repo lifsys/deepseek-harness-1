@@ -652,6 +652,9 @@ importers:
       '@deepseek-ai/dsh-invariants':
         specifier: workspace:^
         version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-trust-identity':
+        specifier: workspace:^
+        version: link:../../trust/trust-identity
       '@deepseek-ai/dsh-typert-registry':
         specifier: workspace:^
         version: link:../../typert/registry
@@ -1317,6 +1320,9 @@ importers:
       '@deepseek-ai/dsh-trust-authorization-rbac':
         specifier: workspace:^
         version: link:../../trust/trust-authorization-rbac
+      '@deepseek-ai/dsh-trust-gateway':
+        specifier: workspace:^
+        version: link:../../trust/trust-gateway
       '@deepseek-ai/dsh-trust-identity-oidc':
         specifier: workspace:^
         version: link:../../trust/trust-identity-oidc
@@ -1333,9 +1339,45 @@ importers:
       '@deepseek-ai/cordis':
         specifier: workspace:^
         version: link:../../../vendor/cordis
+      '@deepseek-ai/cordis-plugin-include':
+        specifier: workspace:^
+        version: link:../../../vendor/include
+      '@deepseek-ai/cordis-plugin-loader':
+        specifier: workspace:^
+        version: link:../../../vendor/loader
+      '@deepseek-ai/dsh-agent':
+        specifier: workspace:^
+        version: link:../../core/agent
+      '@deepseek-ai/dsh-api-gateway':
+        specifier: workspace:^
+        version: link:../../api/gateway
       '@deepseek-ai/dsh-invariants':
         specifier: workspace:^
         version: link:../../runtime-diagnostics/invariants
+      '@deepseek-ai/dsh-session':
+        specifier: workspace:^
+        version: link:../../core/session
+      '@deepseek-ai/dsh-system-prompt':
+        specifier: workspace:^
+        version: link:../../core/system-prompt
+      '@deepseek-ai/dsh-tools':
+        specifier: workspace:^
+        version: link:../../core/tools
+      '@deepseek-ai/dsh-trust-audit':
+        specifier: workspace:^
+        version: link:../../trust/trust-audit
+      '@deepseek-ai/dsh-trust-identity':
+        specifier: workspace:^
+        version: link:../../trust/trust-identity
+      '@deepseek-ai/dsh-trust-log':
+        specifier: workspace:^
+        version: link:../../trust/trust-log
+      '@deepseek-ai/dsh-typert-protocol':
+        specifier: workspace:^
+        version: link:../../typert/protocol
+      '@deepseek-ai/dsh-typert-registry':
+        specifier: workspace:^
+        version: link:../../typert/registry
 
   packages/bundle/headless:
     dependencies:

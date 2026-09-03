@@ -5,6 +5,7 @@ import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 export const name = 'trust-audit-otel-invariant'
 export const inject = ['invariants']
 
+// No runtime invariant: OTLP export is a sink handoff with no package-local event pairing.
 const install: InvariantInstaller = () => {}
 
 export const apply = (ctx: Context): Promise<() => void> =>

@@ -5,6 +5,7 @@ import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 export const name = 'trust-admission-invariant'
 export const inject = ['invariants']
 
+// No runtime invariant: admission is a config-table lookup with no mutable event relation.
 const install: InvariantInstaller = () => {}
 
 export const apply = (ctx: Context): Promise<() => void> =>
