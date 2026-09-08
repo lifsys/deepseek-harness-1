@@ -8,8 +8,8 @@ import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Include from '@deepseek-ai/cordis-plugin-include'
 import { ToolCallId } from '@deepseek-ai/dsh-llm'
 import { Session, SessionId, type SessionEvent } from '@deepseek-ai/dsh-session'
-import AgentRegistry, { Inbox } from '@deepseek-ai/dsh-agent'
-import type { Agent } from '@deepseek-ai/dsh-agent'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import type { Agent, Inbox } from '@deepseek-ai/dsh-agent'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
 import OidcTrustIdentityProvider from '@deepseek-ai/dsh-trust-identity-oidc'
@@ -82,12 +82,29 @@ class ProbeService extends Service {
   }
 }
 
+/** Inbox stub for Agent registration; this suite does not exercise queue mutations. */
+function unusedInbox(): Inbox {
+  const reject = (): never => {
+    throw new Error('this test Agent does not support Inbox mutations')
+  }
+  return {
+    nextTurn: [],
+    nextStep: [],
+    clear: reject,
+    append: reject,
+    prepend: reject,
+    replace: reject,
+    remove: reject,
+    splice: reject,
+  }
+}
+
 function agent(ctx: Context): Agent {
   const scope = ctx.plugin(() => {})
   const id = SessionId('enterprise-trust-agent')
   const session = Session.create(id)
   const value: Agent = {
-    id, options: {}, session, inbox: new Inbox(session, { inserted: () => {}, discarded: () => {}, claimed: () => {} }),
+    id, options: {}, session, inbox: unusedInbox(),
     status: 'idle',
     ctx: scope.ctx,
     send: () => {},
@@ -309,27 +326,32 @@ describe('enterprise trust REAL composition', () => {
     expect(resultText(result)).toContain('authorization denied')
   })
 
-  it('tampered trust-log hash chain refuses verify and persistence load', async () => {
+  it('tampered trust-log hash chain refuses verify and persistence open', async () => {
     root = await mkdtemp(join(tmpdir(), 'dsh-enterprise-log-'))
     const chainRoot = join(root, 'trust-log')
     context = new Context()
     await context.plugin(SessionStore)
     const eventsHolder: { events: SessionEvent[] } = { events: [] }
     context.provide('sessionPersistence', {
-      async load(id: SessionId) {
-        return { meta: { id }, events: eventsHolder.events }
+      async open(id: SessionId) {
+        return {
+          id,
+          async read() {
+            return { eventState: 'shared', events: eventsHolder.events }
+          },
+        }
       },
     } as never)
     await context.plugin(JsonlTrustLogProvider, { root: chainRoot })
 
     const session = context.sessions.create()
     session.append('turn/start', { turn: 1 })
-    eventsHolder.events = [...session.events]
-    await context.trustLog.extendChain(session.id, [...session.events])
+    eventsHolder.events = [...session.snapshotEvents()]
+    await context.trustLog.extendChain(session.id, [...session.snapshotEvents()])
     const chainPath = join(chainRoot, `${session.id}.chain.jsonl`)
     const text = await readFile(chainPath, 'utf8')
     await writeFile(chainPath, text.replace(/[0-9a-f]{64}/, '0'.repeat(64)), 'utf8')
     await expect(context.trustLog.verifySession(session.id)).rejects.toBeInstanceOf(TrustLogTamperedError)
-    await expect(context.sessionPersistence.load(session.id)).rejects.toBeInstanceOf(TrustLogTamperedError)
+    await expect(context.sessionPersistence.open(session.id, 'read')).rejects.toBeInstanceOf(TrustLogTamperedError)
   })
 })

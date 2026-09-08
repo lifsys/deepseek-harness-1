@@ -10,7 +10,7 @@ import { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
 import { snapshotSessionEvent } from '@deepseek-ai/dsh-session'
 import type { SessionEvent, SessionId } from '@deepseek-ai/dsh-session'
-import type { SessionInspection, SessionPersistence } from '@deepseek-ai/dsh-session-persistence'
+import type { SessionHandle, SessionPersistence } from '@deepseek-ai/dsh-session-persistence'
 import {
   TrustLogProvider,
   TrustLogTamperedError,
@@ -33,7 +33,7 @@ interface ChainRecord {
 
 /**
  * Hash-chain {@link TrustLogProvider} with JSONL sidecar files.
- * Wraps `sessionPersistence.load` to refuse tampered chains fail-closed.
+ * Wraps `sessionPersistence.open` to refuse tampered chains fail-closed.
  */
 export class JsonlTrustLogProvider extends TrustLogProvider {
   static inject = ['sessions']
@@ -51,10 +51,10 @@ export class JsonlTrustLogProvider extends TrustLogProvider {
       })
     }, { global: true })
     ctx.inject(['sessionPersistence'], (scoped) => {
-      scoped.effect(() => wrapPersistenceLoad(
+      scoped.effect(() => wrapPersistenceOpen(
         scoped.sessionPersistence,
         (id, events) => this.verifyEvents(id, events),
-      ), 'trust-log-jsonl load verification')
+      ), 'trust-log-jsonl open verification')
     })
   }
 
@@ -62,7 +62,7 @@ export class JsonlTrustLogProvider extends TrustLogProvider {
   async verifySession(sessionId: SessionId): Promise<void> {
     const session = this.ctx.sessions.get(sessionId)
     if (session === undefined) throw new TrustLogTamperedError(sessionId, `session ${sessionId} is not loaded`)
-    await this.verifyEvents(sessionId, session.events)
+    await this.verifyEvents(sessionId, session.snapshotEvents())
   }
 
   /**
@@ -143,30 +143,31 @@ export class JsonlTrustLogProvider extends TrustLogProvider {
 }
 
 /**
- * Wrap persistence load so tampered chains refuse before the inspection returns.
+ * Wrap persistence open so tampered chains refuse before the handle is returned.
  * @param persistence - active session persistence service.
  * @param verify - fail-closed verifier for the loaded event sequence.
- * @returns a disposer restoring the provider's own `load`.
+ * @returns a disposer restoring the provider's own `open`.
  */
-function wrapPersistenceLoad(
+function wrapPersistenceOpen(
   persistence: SessionPersistence,
   verify: (id: SessionId, events: readonly SessionEvent[]) => Promise<void>,
 ): () => void {
   if (WRAPPED.has(persistence)) return () => {}
   WRAPPED.add(persistence)
-  const original = persistence.load.bind(persistence)
-  persistence.load = async (id: SessionId): Promise<SessionInspection> => {
-    const inspection = await original(id)
-    await verify(id, inspection.events)
-    return inspection
+  const original = persistence.open.bind(persistence)
+  persistence.open = async (id, access, options): Promise<SessionHandle> => {
+    const handle = await original(id, access, options)
+    const { events } = await handle.read()
+    await verify(id, events)
+    return handle
   }
   return () => {
-    persistence.load = original
+    persistence.open = original
     WRAPPED.delete(persistence)
   }
 }
 
-/** Persistence services whose `load` this package already wraps; a second mount must not double-verify. */
+/** Persistence services whose `open` this package already wraps; a second mount must not double-verify. */
 const WRAPPED = new WeakSet<SessionPersistence>()
 
 function chainPath(root: string, sessionId: SessionId): string {

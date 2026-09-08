@@ -4,8 +4,8 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import { ToolCallId } from '@deepseek-ai/dsh-llm'
 import { Session, SessionId } from '@deepseek-ai/dsh-session'
-import AgentRegistry, { Inbox } from '@deepseek-ai/dsh-agent'
-import type { Agent } from '@deepseek-ai/dsh-agent'
+import AgentRegistry from '@deepseek-ai/dsh-agent'
+import type { Agent, Inbox } from '@deepseek-ai/dsh-agent'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime, { defineContentToolFixture } from '@deepseek-ai/dsh-tools'
 import MemoryTrustLeaseProvider, { type CapabilityLease, type LeaseId, type LeaseScope } from '@deepseek-ai/dsh-trust-lease'
@@ -46,6 +46,23 @@ class ExpiredLeaseProvider extends RecordingLeaseProvider {
   }
 }
 
+/** Inbox stub for Agent registration; this suite does not exercise queue mutations. */
+function unusedInbox(): Inbox {
+  const reject = (): never => {
+    throw new Error('this test Agent does not support Inbox mutations')
+  }
+  return {
+    nextTurn: [],
+    nextStep: [],
+    clear: reject,
+    append: reject,
+    prepend: reject,
+    replace: reject,
+    remove: reject,
+    splice: reject,
+  }
+}
+
 /** Register one Agent whose scope the tool executor runs under. */
 function agent(ctx: Context): Agent {
   const scope = ctx.plugin(() => {})
@@ -55,7 +72,7 @@ function agent(ctx: Context): Agent {
     id,
     options: {},
     session,
-    inbox: new Inbox(session, { inserted: () => {}, discarded: () => {}, claimed: () => {} }),
+    inbox: unusedInbox(),
     status: 'idle',
     ctx: scope.ctx,
     send: () => {},

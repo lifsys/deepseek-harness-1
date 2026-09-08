@@ -22,7 +22,7 @@ describe('trust log jsonl', () => {
       const ctx = await boot(root)
       const session = ctx.sessions.create()
       session.append('turn/start', { turn: 1 })
-      await ctx.trustLog.extendChain(session.id, [...session.events])
+      await ctx.trustLog.extendChain(session.id, [...session.snapshotEvents()])
       const chainPath = join(root, `${session.id}.chain.jsonl`)
       const text = await readFile(chainPath, 'utf8')
       await writeFile(chainPath, text.replace(/[0-9a-f]{64}/, '0'.repeat(64)), 'utf8')
