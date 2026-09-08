@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "lib/types" },
+  "include": ["src"],
+  "references": [
+    { "path": "../../../vendor/cordis" },
+    { "path": "../../../vendor/loader" },
+    { "path": "../../../vendor/schemastery" },
+    { "path": "../../boot/cmdline" },
+    { "path": "../../trust/trust-audit" },
+    { "path": "../../trust/trust-audit-file" },
+    { "path": "../../trust/trust-identity" },
+    { "path": "../../runtime-diagnostics/invariants" }
+  ]
+}

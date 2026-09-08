@@ -1,0 +1,85 @@
+# The dsh-enterprise bundle patch: opt-in trust core over dsh-base.
+# Default web and headless profiles do not include these rows.
+
+- insert:
+    - id: trust-identity
+      name: '@deepseek-ai/dsh-trust-identity-oidc'
+      config:
+        staticBindings:
+          - token: enterprise-admin-token
+            principal:
+              userId: admin-1
+              displayName: Enterprise Admin
+              roles: [admin]
+          - token: enterprise-dev-token
+            principal:
+              userId: dev-1
+              displayName: Enterprise Developer
+              roles: [developer]
+
+    - id: trust-gateway
+      name: '@deepseek-ai/dsh-trust-gateway'
+
+    - id: trust-authorization
+      name: '@deepseek-ai/dsh-trust-authorization-rbac'
+      config:
+        roles:
+          - role: admin
+            permissions: ['*']
+          - role: developer
+            permissions: ['tool:Read', 'tool:Grep', 'tool:Glob', 'tool:Shell']
+          - role: auditor
+            permissions: ['audit:export']
+          - role: agent-user
+            permissions: ['tool:*']
+        denyTools: [danger-full-access]
+
+    - id: trust-log
+      name: '@deepseek-ai/dsh-trust-log-jsonl'
+      config:
+        root: !!js ctx.dshHomePath('trust-log')
+
+    - id: trust-audit
+      name: '@deepseek-ai/dsh-trust-audit-file'
+
+    - id: trust-audit-otel
+      name: '@deepseek-ai/dsh-trust-audit-otel'
+
+    - id: trust-approval-audit
+      name: '@deepseek-ai/dsh-trust-approval-audit'
+
+    - id: trust-lease
+      name: '@deepseek-ai/dsh-trust-lease'
+
+    - id: trust-admission
+      name: '@deepseek-ai/dsh-trust-admission'
+
+    # Admission digests are site-specific: an operator records the bundles this
+    # installation admits, then enables both rows. Enabling the boot row without
+    # `expected` rows refuses to load rather than admitting everything silently.
+    - id: trust-admission-boot
+      name: '@deepseek-ai/dsh-trust-admission-boot'
+      disabled: true
+
+    - id: trust-lease-runner
+      name: '@deepseek-ai/dsh-trust-lease-runner'
+      config:
+        gatedTools: [dynamic_cordis_invoke]
+
+    - id: trust-approval-grants
+      name: '@deepseek-ai/dsh-trust-approval-grants'
+
+    # Enterprise secrets resolve from Vault. The operator supplies the address,
+    # KV v2 mount, and token environment variable; an unset address or mount
+    # refuses to load rather than falling back to on-disk secrets.
+    - id: credentials-vault
+      name: '@deepseek-ai/dsh-credentials-vault'
+      config:
+        address: !!js process.env.DSH_VAULT_ADDR
+        mountPath: !!js process.env.DSH_VAULT_MOUNT
+        tokenRef: !!js process.env.DSH_VAULT_TOKEN_REF ?? 'VAULT_TOKEN'
+
+# The plain YAML/.env credential store is off under enterprise policy: secrets
+# come from Vault, and the local provider is writable from inside the harness.
+- id: credentials
+  disabled: true

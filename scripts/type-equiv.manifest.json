@@ -118,11 +118,6 @@
     },
     {
       "doc": "docs/subsystems/core.md",
-      "symbol": "Inbox",
-      "source": "packages/core/agent/src/runtime-types.ts"
-    },
-    {
-      "doc": "docs/subsystems/core.md",
       "symbol": "InboxTarget",
       "source": "packages/core/agent/src/types.ts"
     },
@@ -205,11 +200,6 @@
     {
       "doc": "docs/subsystems/goal.md",
       "symbol": "GoalView",
-      "source": "packages/goal/goal/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/goal.md",
-      "symbol": "GoalActivationChanged",
       "source": "packages/goal/goal/src/types.ts"
     },
     {
@@ -480,26 +470,6 @@
       "source": "packages/core/session/src/types.ts"
     },
     {
-      "doc": "docs/subsystems/session.md",
-      "symbol": "SessionSeq",
-      "source": "packages/core/session/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/session.md",
-      "symbol": "SessionLogOffset",
-      "source": "packages/core/session/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/session.md",
-      "symbol": "SessionSeqCursor",
-      "source": "packages/core/session/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/session.md",
-      "symbol": "OptionalSessionSeq",
-      "source": "packages/core/session/src/types.ts"
-    },
-    {
       "doc": "docs/subsystems/todo.md",
       "symbol": "TodoItem",
       "source": "packages/todo/tool-todo/src/types.ts"
@@ -557,27 +527,12 @@
     },
     {
       "doc": "docs/subsystems/persistence.md",
-      "symbol": "SessionHandleReadResult",
-      "source": "packages/session/session-persistence/src/handle.ts"
-    },
-    {
-      "doc": "docs/subsystems/persistence.md",
-      "symbol": "SessionHandle",
-      "source": "packages/session/session-persistence/src/handle.ts"
-    },
-    {
-      "doc": "docs/subsystems/persistence.md",
       "symbol": "SessionHeader",
       "source": "packages/core/session/src/types.ts"
     },
     {
       "doc": "docs/subsystems/persistence.md",
       "symbol": "CreateSessionOptions",
-      "source": "packages/core/session/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/persistence.md",
-      "symbol": "SessionSeedEventState",
       "source": "packages/core/session/src/types.ts"
     },
     {
@@ -603,8 +558,18 @@
     },
     {
       "doc": "docs/subsystems/persistence.md",
+      "symbol": "SessionInspection",
+      "source": "packages/session/session-persistence/src/index.ts"
+    },
+    {
+      "doc": "docs/subsystems/persistence.md",
       "symbol": "SessionLocation",
-      "source": "packages/session/session-persistence/src/errors.ts"
+      "source": "packages/session/session-persistence/src/index.ts"
+    },
+    {
+      "doc": "docs/subsystems/persistence.md",
+      "symbol": "SessionRawArtifact",
+      "source": "packages/session/session-persistence/src/index.ts"
     },
     {
       "doc": "docs/subsystems/session-query.md",
@@ -684,27 +649,27 @@
     {
       "doc": "docs/subsystems/session-title.md",
       "symbol": "SessionTitleProviderId",
-      "source": "packages/session/session-title/src/types.ts"
+      "source": "packages/session/session-title/src/index.ts"
     },
     {
       "doc": "docs/subsystems/session-title.md",
       "symbol": "SessionTitleModelProvenance",
-      "source": "packages/session/session-title/src/types.ts"
+      "source": "packages/session/session-title/src/index.ts"
     },
     {
       "doc": "docs/subsystems/session-title.md",
       "symbol": "SessionTitleSource",
-      "source": "packages/session/session-title/src/types.ts"
+      "source": "packages/session/session-title/src/index.ts"
     },
     {
       "doc": "docs/subsystems/session-title.md",
       "symbol": "SessionTitleEventData",
-      "source": "packages/session/session-title/src/types.ts"
+      "source": "packages/session/session-title/src/index.ts"
     },
     {
       "doc": "docs/subsystems/session-title.md",
       "symbol": "SessionTitleSnapshot",
-      "source": "packages/session/session-title/src/types.ts"
+      "source": "packages/session/session-title/src/index.ts"
     },
     {
       "doc": "docs/subsystems/session-title.md",
@@ -714,7 +679,7 @@
     {
       "doc": "docs/subsystems/session-title.md",
       "symbol": "SessionTitleUserMessage",
-      "source": "packages/session/session-title/src/types.ts"
+      "source": "packages/session/session-title/src/index.ts"
     },
     {
       "doc": "docs/subsystems/session-title.md",
@@ -754,11 +719,6 @@
     {
       "doc": "docs/subsystems/session-reference.md",
       "symbol": "SessionReferenceMentionCandidate",
-      "source": "packages/context/session-reference/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/session-reference.md",
-      "symbol": "SessionReferenceSource",
       "source": "packages/context/session-reference/src/types.ts"
     },
     {
@@ -969,21 +929,6 @@
     {
       "doc": "docs/subsystems/attachment.md",
       "symbol": "ImageAttachmentLimits",
-      "source": "packages/attachment/attachment/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/attachment.md",
-      "symbol": "PromptContentPart",
-      "source": "packages/attachment/attachment/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/attachment.md",
-      "symbol": "AttachmentAdmissionPart",
-      "source": "packages/attachment/attachment/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/attachment.md",
-      "symbol": "AdmittedPromptContentPart",
       "source": "packages/attachment/attachment/src/types.ts"
     },
     {
@@ -1358,23 +1303,38 @@
     },
     {
       "doc": "docs/subsystems/subagent.md",
-      "symbol": "AgentMessageSource",
-      "source": "packages/subagent/subagent/src/continuation-messages.ts"
+      "symbol": "CoordinatorMessageSource",
+      "source": "packages/subagent/subagent/src/continuation.ts"
+    },
+    {
+      "doc": "docs/subsystems/subagent.md",
+      "symbol": "SubagentReportMessageSource",
+      "source": "packages/subagent/subagent/src/continuation.ts"
+    },
+    {
+      "doc": "docs/subsystems/subagent.md",
+      "symbol": "SubagentReportDelivery",
+      "source": "packages/subagent/subagent/src/continuation.ts"
     },
     {
       "doc": "docs/subsystems/subagent.md",
       "symbol": "SubagentSettledMessageSource",
-      "source": "packages/subagent/subagent/src/continuation-messages.ts"
+      "source": "packages/subagent/subagent/src/continuation.ts"
     },
     {
       "doc": "docs/subsystems/subagent.md",
-      "symbol": "SubagentSendMessageOptions",
-      "source": "packages/subagent/subagent/src/types.ts"
+      "symbol": "SubagentReportOptions",
+      "source": "packages/subagent/subagent/src/continuation.ts"
+    },
+    {
+      "doc": "docs/subsystems/subagent.md",
+      "symbol": "SubagentFollowupOptions",
+      "source": "packages/subagent/subagent/src/continuation.ts"
     },
     {
       "doc": "docs/subsystems/subagent.md",
       "symbol": "SubagentInterruptAuthority",
-      "source": "packages/subagent/subagent/src/types.ts"
+      "source": "packages/subagent/subagent/src/continuation.ts"
     },
     {
       "doc": "docs/subsystems/subagent.md",
@@ -1384,7 +1344,7 @@
     {
       "doc": "docs/subsystems/subagent.md",
       "symbol": "ContinuableStart",
-      "source": "packages/subagent/subagent/src/types.ts"
+      "source": "packages/subagent/subagent/src/continuation.ts"
     },
     {
       "doc": "docs/subsystems/subagent.md",
@@ -1833,16 +1793,6 @@
     },
     {
       "doc": "docs/subsystems/session-telemetry.md",
-      "symbol": "SessionTelemetryCapture",
-      "source": "packages/session/session-telemetry/src/coordinator.ts"
-    },
-    {
-      "doc": "docs/subsystems/session-telemetry.md",
-      "symbol": "SessionTelemetryCaptureOptions",
-      "source": "packages/session/session-telemetry/src/coordinator.ts"
-    },
-    {
-      "doc": "docs/subsystems/session-telemetry.md",
       "symbol": "SessionTelemetrySharingStatus",
       "source": "packages/session/session-telemetry/src/index.ts"
     },
@@ -1958,11 +1908,6 @@
     },
     {
       "doc": "docs/subsystems/core.md",
-      "symbol": "AssistantStreamFrame",
-      "source": "packages/core/agent/src/runtime-types.ts"
-    },
-    {
-      "doc": "docs/subsystems/core.md",
       "symbol": "AgentOptions",
       "source": "packages/core/agent/src/runtime-types.ts"
     },
@@ -1979,16 +1924,6 @@
     {
       "doc": "docs/subsystems/feedback.md",
       "symbol": "MessageFeedbackItem",
-      "source": "packages/feedback/message-feedback/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/feedback.md",
-      "symbol": "MessageFeedbackPut",
-      "source": "packages/feedback/message-feedback/src/types.ts"
-    },
-    {
-      "doc": "docs/subsystems/feedback.md",
-      "symbol": "MessageFeedbackDelete",
       "source": "packages/feedback/message-feedback/src/types.ts"
     },
     {
@@ -2075,6 +2010,16 @@
       "doc": "packages/client/ui-conversation/README.md",
       "symbol": "ComposerChainProps",
       "source": "packages/client/ui-conversation/src/client/contract/slots.ts"
+    },
+    {
+      "doc": "docs/subsystems/trust-identity.md",
+      "symbol": "Principal",
+      "source": "packages/trust/trust-identity/src/types.ts"
+    },
+    {
+      "doc": "docs/subsystems/trust-authorization.md",
+      "symbol": "AuthorizationDecision",
+      "source": "packages/trust/trust-authorization/src/types.ts"
     }
   ]
 }

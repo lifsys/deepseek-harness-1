@@ -1,0 +1,23 @@
+# The dsh-trust-audit-cli bundle patch: the operator audit-export app over
+# dsh-base. It mounts no Host, HTTP server, Web runtime, or browser plugin.
+# The file audit provider reads the same append-only log the enterprise profile
+# writes, so an export runs without booting the enterprise Host surface.
+
+- insert:
+    - id: trust-audit
+      name: '@deepseek-ai/dsh-trust-audit-file'
+
+    - id: trust-audit-export-startup
+      name: '@deepseek-ai/dsh-trust-audit-cli/startup'
+
+    # Reads its request from the ordinary trustAuditExport provider.
+    - id: trust-audit-export
+      name: '@deepseek-ai/dsh-trust-audit-cli'
+      inject: [trustAuditExport]
+      config:
+        sink: !!js ctx.trustAuditExport.sink
+        since: !!js ctx.trustAuditExport.since
+        until: !!js ctx.trustAuditExport.until
+        types: !!js ctx.trustAuditExport.types
+        userId: !!js ctx.trustAuditExport.userId
+        out: !!js ctx.trustAuditExport.out

@@ -27,6 +27,7 @@ import type {
   HostConnectionHandle,
   HostConnectionRpc,
 } from './rpc.ts'
+import { withRpcRequest } from './rpc-request-scope.ts'
 
 const INVALID_REQUEST_RPC_ID = RpcId('invalid-request')
 const CHANNEL_PATTERN = /^\/[A-Za-z0-9._~-]+$/
@@ -244,7 +245,8 @@ function rpcFetchHandler(
       }
 
       try {
-        const result = await handler(endpoint, message.payload, request.signal)
+        const result = await withRpcRequest(request, () =>
+          handler(endpoint, message.payload, request.signal))
         return fullResponse(message.rpcId, result)
       } catch (error) {
         return new Response(`handler failure: ${String(error)}`, { status: 500 })
