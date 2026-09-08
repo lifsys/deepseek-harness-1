@@ -7,10 +7,14 @@
 
 import { randomUUID } from 'node:crypto'
 import { Context, Service, symbols } from '@deepseek-ai/cordis'
-import type { ConnectionRpcHandler } from '@deepseek-ai/dsh-client-connection'
+import { currentRpcRequest, type ConnectionRpcHandler } from '@deepseek-ai/dsh-client-connection'
 import { Deque } from '@deepseek-ai/dsh-deque'
 import type { WebUpgradeRoute } from '@deepseek-ai/dsh-host-webserver'
 import { MAX_TIMER_DELAY_MS } from '@deepseek-ai/dsh-timeout'
+import {
+  TrustIdentityUnauthorizedError,
+  type TrustIdentityProvider,
+} from '@deepseek-ai/dsh-trust-identity'
 import z from '@deepseek-ai/schemastery'
 export type { TypertGatewayFaultDetails } from './remote-error-codes.ts'
 import {
@@ -457,12 +461,7 @@ export class TypertGatewayService extends Service implements TypertGateway {
   private startRemoteEvent(source: TypertRemoteEventInvocation): void {
     try {
       assertRemoteEventName(source)
-      const context = this.ctx.typert.contexts.identifyHost(source.context.value)
-      if (context === undefined) {
-        source.resolve({ kind: 'next' })
-        return
-      }
-      if (context.kind !== 'agent' || !isRemoteEventAgentId(context.identity)) {
+      if (!isRemoteEventAgentId(source.context.agentId)) {
         throw new TypeError(
           'typert gateway: scoped Remote events require a non-empty Agent identity',
         )
@@ -476,7 +475,7 @@ export class TypertGatewayService extends Service implements TypertGateway {
           () => () => {
             this.cancelRemoteEvent(
               pending,
-              new Error(`typert gateway: Remote event Context ${JSON.stringify(context.kind)} was released`),
+              new Error('typert gateway: Remote event Agent Context was released'),
             )
           },
           `api-gateway: Remote event ${JSON.stringify(source.event)}`,
@@ -500,7 +499,7 @@ export class TypertGatewayService extends Service implements TypertGateway {
           type: 'waterfall',
           event: source.event,
           eventId: id,
-          agentId: context.identity,
+          agentId: source.context.agentId,
           request: projected.request,
         },
         deliveries: new Set(),
@@ -589,7 +588,12 @@ export class TypertGatewayService extends Service implements TypertGateway {
 
   private async invokeRpc(endpoint: string, payload: unknown, signal: AbortSignal): Promise<ConnectionRpcResult> {
     try {
-      const value = await this.invoke(remoteRequest(endpoint, payload, signal))
+      const identity = this.ctx.get('trustIdentity')
+      if (identity === undefined) {
+        const value = await this.invoke(remoteRequest(endpoint, payload, signal))
+        return { ok: true, value }
+      }
+      const value = await this.invokeWithPrincipal(identity, endpoint, payload, signal)
       // A void or explicitly absent business result carries no `value` field;
       // JSON has no `undefined`, and the envelope's optional slot is the one
       // representation of absence that both args and results already use.
@@ -597,6 +601,29 @@ export class TypertGatewayService extends Service implements TypertGateway {
     } catch (error) {
       return rpcFailure(error)
     }
+  }
+
+  /**
+   * Bind an authenticated principal for one Host RPC when enterprise identity is mounted.
+   * Prefer an already-bound principal (tests / nested calls); otherwise authenticate a
+   * Bearer credential from the active Fetch request. Missing or invalid credentials fail closed.
+   */
+  private async invokeWithPrincipal(
+    identity: TrustIdentityProvider,
+    endpoint: string,
+    payload: unknown,
+    signal: AbortSignal,
+  ): Promise<unknown> {
+    if (identity.currentPrincipal() !== undefined) {
+      identity.requirePrincipal()
+      return this.invoke(remoteRequest(endpoint, payload, signal))
+    }
+    const credential = bearerCredential(currentRpcRequest())
+    if (credential === undefined) throw new TrustIdentityUnauthorizedError()
+    const session = await identity.authenticate({ credential })
+    if (session === undefined) throw new TrustIdentityUnauthorizedError('invalid credential')
+    return identity.withPrincipal(session.principal, () =>
+      this.invoke(remoteRequest(endpoint, payload, signal)))
   }
 
   private async prepareInvocation(request: InvokeRemoteRequest): Promise<PreparedInvocation> {
@@ -996,6 +1023,16 @@ function remoteCancelled(endpoint: string, cause: unknown): RemoteError<'gateway
 }
 
 function rpcFailure(error: unknown): ConnectionRpcResult {
+  if (isUnauthorizedError(error)) {
+    return {
+      ok: false,
+      error: {
+        code: 'unauthorized',
+        message: error instanceof Error ? error.message : 'authentication required',
+        details: {},
+      },
+    }
+  }
   const remote = remoteErrorOf(error)
   if (remote !== undefined) {
     return { ok: false, error: { code: remote.code, message: remote.message, details: remote.details } }
@@ -1016,6 +1053,21 @@ function rpcError(error: unknown): ConnectionRpcError & RemoteStreamFailure {
 
 function endpointOf(namespace: string, method: string): string {
   return `${namespace}/${method}`
+}
+
+function isUnauthorizedError(error: unknown): boolean {
+  return error instanceof Error
+    && (error.name === 'TrustIdentityUnauthorizedError'
+      || (error as { code?: unknown }).code === 'unauthorized')
+}
+
+/** Extract a Bearer token from the active Fetch request Authorization header. */
+function bearerCredential(request: Request | undefined): string | undefined {
+  if (request === undefined) return undefined
+  const header = request.headers.get('authorization')
+  if (header === null) return undefined
+  const match = /^Bearer\s+(\S+)/iu.exec(header.trim())
+  return match?.[1]
 }
 
 function validateBinding(
