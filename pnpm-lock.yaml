@@ -9639,6 +9639,10 @@ importers:
         version: link:../../runtime-diagnostics/invariants
 
   packages/trust/trust-identity-oidc:
+    dependencies:
+      jose:
+        specifier: ^6.2.3
+        version: 6.2.3
     devDependencies:
       '@deepseek-ai/cordis':
         specifier: workspace:^

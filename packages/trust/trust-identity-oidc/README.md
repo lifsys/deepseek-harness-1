@@ -74,7 +74,7 @@ Independent of model request assembly.
 
 <a id="known-limitations-and-deferred-work"></a>
 
-- **BLOCKED-FOR-REAL-WORLD — live IdP** — Authorization-code login, JWKS signature verification, token refresh, and SAML against Okta/Entra/Keycloak are not exercised in CI. Static-token mode and unsigned JWT claim parsing (issuer/audience/`sub`) are available for tests and air-gapped bootstrap; do not treat claim parsing as production IdP verification until JWKS verification is wired and proven against a real issuer.
+- **Authorization-code login / SAML** — Host surfaces still need an interactive login bridge for browser OIDC code flow and SAML adapters; bearer JWT verification against issuer JWKS is implemented (discovery or `jwksUri`, plus injectable JWKS for tests). Live Zitadel JWKS refusal of foreign-signed tokens is covered in package tests.
 - **Anonymous preview** — Default `web`/`headless` profiles omit this provider; Host RPC stays on browser-session cookies only.
 
 <a id="dev-note"></a>

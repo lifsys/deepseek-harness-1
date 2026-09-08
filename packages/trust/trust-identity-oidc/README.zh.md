@@ -74,7 +74,7 @@ Independent of model request assembly.
 
 <a id="known-limitations-and-deferred-work"></a>
 
-- **BLOCKED-FOR-REAL-WORLD — 真实 IdP** — CI 不覆盖授权码登录、JWKS 签名校验、token 刷新，以及对 Okta/Entra/Keycloak 的 SAML。静态 token 模式与未签名 JWT claim 解析（issuer/audience/`sub`）供测试与气隙引导使用；在接入 JWKS 校验并对照真实 issuer 取证之前，不要把 claim 解析当作生产 IdP 校验。
+- **授权码登录 / SAML** — 浏览器 OIDC 授权码流与 SAML 适配器仍需交互式登录桥接；bearer JWT 已对 issuer JWKS 做签名校验（发现或 `jwksUri`，测试可注入 JWKS）。包测试覆盖对真实 Zitadel JWKS 拒收外键签名 token 的路径。
 - **匿名预览** — 默认 `web`/`headless` profile 省略本 provider；Host RPC 仅保留浏览器会话 cookie。
 
 <a id="dev-note"></a>
