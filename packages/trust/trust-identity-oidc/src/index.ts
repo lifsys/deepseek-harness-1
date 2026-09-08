@@ -167,10 +167,12 @@ export class OidcTrustIdentityProvider extends TrustIdentityProvider {
     if (headerAlg === undefined || headerAlg === 'none') return undefined
 
     const getKey = await this.getKeyResolver()
+    const issuer = this.spec.issuer
+    if (issuer === undefined) return undefined
     let payload: JWTPayload
     try {
       const verified = await jwtVerify(credential, getKey, {
-        issuer: this.spec.issuer,
+        issuer,
         ...(this.spec.audience !== undefined ? { audience: this.spec.audience } : {}),
       })
       payload = verified.payload
